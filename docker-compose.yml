@@ -1,0 +1,15 @@
+services:
+  db:
+    image: mariadb:11.8.6
+    container_name: trip_sentinel_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: trip_sentinel
+      MYSQL_USER: trip_sentinel_user
+      MYSQL_PASSWORD: trip_sentinel_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - trip_sentinel_mariadb_data:/var/lib/mysql
+volumes:
+  trip_sentinel_mariadb_data:
