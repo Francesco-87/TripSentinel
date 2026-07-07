@@ -13,9 +13,8 @@ This document records the major technical decisions made throughout the project 
 **Reasoning**
 
 * Descriptive and memorable.
-* Clearly communicates the project's purpose.
 * Suitable for a portfolio project.
-* Flexible enough to evolve beyond hiking into general planned-return safety.
+* Flexible enough to expand beyond hiking into planned-return safety.
 
 ---
 
@@ -49,20 +48,26 @@ TripSentinel/
 
 * Clear separation of frontend and backend.
 * Documentation separated from source code.
-* Root-level Docker Compose for infrastructure.
+* Infrastructure managed from the project root.
 
 ---
 
-### Java
+### Backend
 
-**Version:** Oracle JDK 25 LTS
+**Framework:** Spring Boot 4.1
+
+**Build Tool:** Maven
+
+**Java:** Oracle JDK 25 LTS
+
+**Packaging:** JAR
 
 **Reasoning**
 
-* Current Long-Term Support release.
-* Appropriate for a new Spring Boot project.
-* Long support lifecycle.
-* Stable foundation for the project.
+* Current stable technology stack.
+* Long-term support for Java.
+* Self-contained deployment.
+* Familiar and well-supported ecosystem.
 
 ---
 
@@ -70,57 +75,86 @@ TripSentinel/
 
 **Database:** MariaDB 11.8.6
 
+**Deployment:** Docker Compose
+
 **Reasoning**
 
-* Mature SQL database.
+* Mature relational SQL database.
 * Excellent Spring Boot compatibility.
-* Well suited for relational application data.
-* Familiar technology.
-
----
-
-### Containerization
-
-**Tool:** Docker Compose
-
-**Current Service:** MariaDB
-
-**Reasoning**
-
-* Infrastructure defined as code.
-* Reproducible development environment.
+* Reproducible local development.
 * No local database installation required.
-* Easy onboarding for future contributors.
 
 ---
 
 ### Database Migrations
 
-**Tool:** Flyway (planned)
+**Tool:** Flyway
 
 **Reasoning**
 
-* Version-controlled database schema.
-* Repeatable migrations.
-* Consistent database state across environments.
-* Integrates well with Spring Boot.
+* Database schema managed through version-controlled SQL migrations.
+* Schema changes are never performed automatically by Hibernate.
 
 ---
 
-### Frontend
+### Database Design
 
-**Framework:** React
+**Approach**
 
-**Build Tool:** Vite
+* Database-first design.
+* Schema created manually before JPA entities.
+* Normalized relational model.
+* Flyway migration defines the initial schema.
 
-**Language:** TypeScript
+**Key Decisions**
+
+* Single `users` table.
+* Many-to-many relationship between users and roles (`user_roles`).
+* Users may have multiple roles (e.g. CUSTOMER and RESPONDER).
+* Session-specific data separated from user data.
+* Availability stored independently from sessions.
+* Session history recorded through `session_events`.
+* Database optimized with foreign key indexes from the initial migration.
 
 **Reasoning**
 
-* Existing experience.
-* Modern tooling.
-* Strong ecosystem.
-* Suitable for Progressive Web Applications.
+* Supports future expansion without major schema changes.
+* Keeps responsibilities separated.
+* Simplifies authentication while allowing multiple roles.
+* Preserves an audit trail of session activity.
+* Improves query performance on common lookups.
+
+---
+
+### JPA Configuration
+
+**Hibernate**
+
+* `ddl-auto=validate`
+* `open-in-view=false`
+
+**Reasoning**
+
+* Flyway is the single source of truth for schema changes.
+* Hibernate validates the schema instead of modifying it.
+* Encourages a clean service-layer architecture.
+
+---
+
+### Application Configuration
+
+**Configuration Format:** YAML
+
+**Files**
+
+* `application.yml`
+* `application-docker.yml`
+
+**Reasoning**
+
+* Separate local and Docker environments.
+* Easier to extend with additional profiles later.
+* YAML provides better readability for hierarchical configuration.
 
 ---
 
@@ -130,16 +164,17 @@ TripSentinel/
 
 **Reasoning**
 
-* Keeps documentation separate from source code.
-* Easy to expand with architecture, API, deployment, and database documentation.
+* Record architectural decisions.
+* Document project evolution.
+* Keep documentation separate from source code.
 
 ---
 
 ### Development Philosophy
 
-* Build the project incrementally.
+* Build incrementally.
 * Keep the MVP small.
 * Avoid premature optimization.
-* Prioritize reproducibility.
-* Record important technical decisions.
-* Treat development as if working within a professional team.
+* Infrastructure as code.
+* Record technical decisions as they are implemented.
+* Treat the project as if developed within a professional team.

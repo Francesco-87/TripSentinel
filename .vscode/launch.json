@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-TripsentinelApplication<tripsentinel>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.cicconesoftware.tripsentinel.TripsentinelApplication",
+            "projectName": "tripsentinel",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
