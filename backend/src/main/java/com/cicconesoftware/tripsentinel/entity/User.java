@@ -1,0 +1,146 @@
+package com.cicconesoftware.tripsentinel.entity;
+
+import java.time.LocalDateTime;
+
+import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+//JPA entity for the User table in the database
+@Entity
+@Table(name = "users")
+public class User {
+    
+    // Primary key for the User entity; auto-generated 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "first_name", nullable = false, length = 100)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 100)
+    private String lastName;
+
+    @Column(name = "email", nullable = false, unique = true, length = 255)
+    private String email;   
+
+    @Column(name = "phone_number", length = 50)
+    private String phoneNumber;
+
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private UserStatus status;
+
+    @Column(name  = "created_at, nullable = false")
+    private LocalDateTime createdAt;
+
+    @Column(name  = "updated_at")
+    private LocalDateTime updatedAt;
+
+
+    // Default constructor
+    public User() {}
+
+
+     // Getters and setters for the fields
+
+
+    public Long getId() {
+        return id;
+    }
+
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+
+    public String getLastName() {
+        return lastName;
+    }
+
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+
+    public String getEmail() {
+        return email;
+    }
+
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    };
+
+   
+    
+}
+
