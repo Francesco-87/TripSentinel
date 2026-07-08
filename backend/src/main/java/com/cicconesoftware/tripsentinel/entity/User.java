@@ -164,6 +164,38 @@ public class User {
         this.updatedAt = updatedAt;
     };
 
+    public Set<Role> getRoles() {
+    return roles;
+}
+
+public void setRoles(Set<Role> roles) {
+    this.roles = roles;
+}
+
+public Set<ResponderAvailability> getAvailabilitySlots() {
+    return availabilitySlots;
+}
+
+public void setAvailabilitySlots(Set<ResponderAvailability> availabilitySlots) {
+    this.availabilitySlots = availabilitySlots;
+}
+
+public Set<CheckInSession> getCustomerSessions() {
+    return customerSessions;
+}
+
+public void setCustomerSessions(Set<CheckInSession> customerSessions) {
+    this.customerSessions = customerSessions;
+}
+
+public Set<CheckInSession> getResponderSessions() {
+    return responderSessions;
+}
+
+public void setResponderSessions(Set<CheckInSession> responderSessions) {
+    this.responderSessions = responderSessions;
+}
+
    
     
 }
