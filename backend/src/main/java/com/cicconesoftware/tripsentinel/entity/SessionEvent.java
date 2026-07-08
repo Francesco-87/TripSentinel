@@ -11,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,8 +24,6 @@ public class SessionEvent {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "session_id", nullable = false)
-    private Long sessionId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "event_type", nullable = false, length = 50)
@@ -39,17 +39,23 @@ public class SessionEvent {
     public SessionEvent() {
     }
 
+    //Relationships with other entities
+    @ManyToOne
+    @JoinColumn(name = "session_id", nullable = false)
+    private CheckInSession session;
+
+
     // Getters and Setters
     public Long getId() {
         return id;
     }
 
-    public Long getSessionId() {
-        return sessionId;
+    public CheckInSession getSession() {
+        return session;
     }
 
-    public void setSessionId(Long sessionId) {
-        this.sessionId = sessionId;
+    public void setSession(CheckInSession session) {
+        this.session = session;
     }
 
     public SessionEventType getEventType() {

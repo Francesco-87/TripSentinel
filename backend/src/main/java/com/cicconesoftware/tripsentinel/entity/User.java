@@ -1,6 +1,8 @@
 package com.cicconesoftware.tripsentinel.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
 
@@ -11,6 +13,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 //JPA entity for the User table in the database
@@ -42,10 +48,10 @@ public class User {
     @Column(name = "status", nullable = false)
     private UserStatus status;
 
-    @Column(name  = "created_at, nullable = false")
+    @Column(name  = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name  = "updated_at")
+    @Column(name  = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
 
@@ -53,7 +59,25 @@ public class User {
     public User() {}
 
 
-     // Getters and setters for the fields
+    //Relationships with other entities
+        @ManyToMany
+        @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+        )
+        private Set<Role> roles = new HashSet<>();
+
+        @OneToMany(mappedBy = "responder")
+        private Set<ResponderAvailability> availabilitySlots = new HashSet<>();
+
+        @OneToMany(mappedBy = "customer")
+        private Set<CheckInSession> customerSessions = new HashSet<>();
+
+        @OneToMany(mappedBy = "responder")
+        private Set<CheckInSession> responderSessions = new HashSet<>();
+
+    // Getters and setters for the fields
 
 
     public Long getId() {

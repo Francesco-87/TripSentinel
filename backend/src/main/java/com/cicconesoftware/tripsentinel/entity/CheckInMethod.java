@@ -1,10 +1,14 @@
 package com.cicconesoftware.tripsentinel.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 //JPA entity for the CheckInMethod table in the database
@@ -23,6 +27,11 @@ public class CheckInMethod {
     // Default constructor
     public CheckInMethod() {}
 
+    //Relationships with other entities
+
+    @ManyToMany(mappedBy = "checkInMethods")
+    private Set<CheckInSession> sessions = new HashSet<>();
+
 
     // Getters and setters for the fields
 
@@ -37,6 +46,14 @@ public class CheckInMethod {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<CheckInSession> getSessions() {
+        return sessions;
+    }
+
+    public void setSessions(Set<CheckInSession> sessions) {
+        this.sessions = sessions;
     }
     
 }

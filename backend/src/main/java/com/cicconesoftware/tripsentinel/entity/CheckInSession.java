@@ -1,6 +1,8 @@
 package com.cicconesoftware.tripsentinel.entity;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
 
@@ -11,6 +13,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,11 +29,6 @@ public class CheckInSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name ="customer_id", nullable = false)
-    private Long customerId;
-
-    @Column(name = "responder_id", nullable = false)
-    private Long responderId;
 
     @Column(name = "start_at", nullable = false)
     private LocalDateTime startAt;
@@ -57,6 +59,26 @@ public class CheckInSession {
     public CheckInSession() {
     }
 
+    //Relationships with other entities
+
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
+    private User customer;
+
+    @ManyToOne
+    @JoinColumn(name = "responder_id", nullable = false)
+    private User responder;
+
+    @ManyToMany
+    @JoinTable(
+        name = "session_check_in_methods",
+        joinColumns = @JoinColumn(name = "session_id"),
+        inverseJoinColumns = @JoinColumn(name = "method_id")
+    )
+    private Set<CheckInMethod> checkInMethods = new HashSet<>();
+
+    @OneToMany(mappedBy = "session")
+    private Set<SessionEvent> events = new HashSet<>();
 
     // Getters and Setters
 
@@ -64,20 +86,20 @@ public class CheckInSession {
         return id;
     }
 
-    public Long getCustomerId() {
-        return customerId;
+    public User getCustomer() {
+        return customer;
     }
 
-    public void setCustomerId(Long customerId) {
-        this.customerId = customerId;
+    public void setCustomer(User customer) {
+        this.customer = customer;
     }
 
-    public Long getResponderId() {
-        return responderId;
+    public User getResponder() {
+        return responder;
     }
 
-    public void setResponderId(Long responderId) {
-        this.responderId = responderId;
+    public void setResponder(User responder) {
+        this.responder = responder;
     }
 
     public LocalDateTime getStartAt() {

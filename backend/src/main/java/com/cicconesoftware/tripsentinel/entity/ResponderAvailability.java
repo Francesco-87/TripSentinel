@@ -11,6 +11,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,9 +23,6 @@ public class ResponderAvailability {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "responder_id", nullable = false)
-    private Long responderId;
 
     @Column(name = "available_from", nullable = false)
     private LocalDateTime availableFrom;
@@ -45,18 +44,23 @@ public class ResponderAvailability {
     public ResponderAvailability() {
     }
 
+    //Relationships with other entities 
+    @ManyToOne
+    @JoinColumn(name = "responder_id", nullable = false)
+    private User responder;
+
     // Getters and Setters
 
     public Long getId() {
         return id;
     }
 
-    public Long getResponderId() {
-        return responderId;
+    public User getResponder() {
+        return responder;
     }
 
-    public void setResponderId(Long responderId) {
-        this.responderId = responderId;
+    public void setResponder(User responder) {
+        this.responder = responder;
     }
 
     public LocalDateTime getAvailableFrom() {
