@@ -33,8 +33,8 @@ public class CheckInSession {
     @Column(name = "start_at", nullable = false)
     private LocalDateTime startAt;
 
-    @Column(name = "end_at", nullable = false)
-    private LocalDateTime endAt;    
+    @Column(name = "expected_return_at", nullable = false)
+    private LocalDateTime expectedReturnAt;
 
     @Column(name = "latest_check_in_at", nullable = false)
     private LocalDateTime latestCheckInAt;  
@@ -102,6 +102,22 @@ public class CheckInSession {
         this.responder = responder;
     }
 
+    public Set<CheckInMethod> getCheckInMethods() {
+    return checkInMethods;
+    }
+
+    public void setCheckInMethods(Set<CheckInMethod> checkInMethods) {
+        this.checkInMethods = checkInMethods;
+    }
+
+    public Set<SessionEvent> getEvents() {
+        return events;
+    }
+
+    public void setEvents(Set<SessionEvent> events) {
+        this.events = events;
+    }
+
     public LocalDateTime getStartAt() {
         return startAt;
     }
@@ -110,12 +126,13 @@ public class CheckInSession {
         this.startAt = startAt;
     }
 
-    public LocalDateTime getEndAt() {
-        return endAt;
+
+    public LocalDateTime getExpectedReturnAt() {
+        return expectedReturnAt;
     }
 
-    public void setEndAt(LocalDateTime endAt) {
-        this.endAt = endAt;
+    public void setExpectedReturnAt(LocalDateTime expectedReturnAt) {
+        this.expectedReturnAt = expectedReturnAt;
     }
 
     public LocalDateTime getLatestCheckInAt() {

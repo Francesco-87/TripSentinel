@@ -68,7 +68,7 @@ CREATE TABLE check_in_sessions (
     responder_id BIGINT NOT NULL,
 
     start_at DATETIME NOT NULL,
-    end_at DATETIME NOT NULL,
+    expected_return_at DATETIME NOT NULL,
     latest_check_in_at DATETIME NOT NULL,
 
     location_description TEXT NOT NULL,
@@ -96,10 +96,10 @@ CREATE TABLE check_in_sessions (
         )),
 
     CONSTRAINT chk_sessions_time_order
-        CHECK (start_at < end_at),
+        CHECK (start_at < expected_return_at),
 
     CONSTRAINT chk_sessions_latest_check_in
-        CHECK (end_at <= latest_check_in_at)
+        CHECK (expected_return_at <= latest_check_in_at)
 );
 
 CREATE TABLE session_check_in_methods (
