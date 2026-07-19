@@ -8,9 +8,9 @@ import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
 
 public class CheckInSessionResponseDto {
 
-    private final long id;
-    private final long customerId;
-    private final long responderId;
+    private final Long id;
+    private final Long customerId;
+    private final Long responderId;
     private final Set<SessionEventResponseDto> events;
     private final Set<CheckInMethodResponseDto> checkInMethods;
     private final LocalDateTime startAt;
@@ -22,7 +22,7 @@ public class CheckInSessionResponseDto {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
-    public CheckInSessionResponseDto(long id, long customerId, long responderId, Set<SessionEventResponseDto> events,
+    public CheckInSessionResponseDto(Long id, Long customerId, Long responderId, Set<SessionEventResponseDto> events,
             Set<CheckInMethodResponseDto> checkInMethods, LocalDateTime startAt, LocalDateTime expectedReturnAt,
             LocalDateTime latestCheckInAt, String locationDescription, String importantNotes, SessionStatus status,
             LocalDateTime createdAt, LocalDateTime updatedAt) {
@@ -41,15 +41,15 @@ public class CheckInSessionResponseDto {
         this.updatedAt = updatedAt;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public long getCustomerId() {
+    public Long getCustomerId() {
         return customerId;
     }
 
-    public long getResponderId() {
+    public Long getResponderId() {
         return responderId;
     }
 
