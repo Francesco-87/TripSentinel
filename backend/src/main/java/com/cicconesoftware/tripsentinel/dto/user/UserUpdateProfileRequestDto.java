@@ -3,7 +3,7 @@ package com.cicconesoftware.tripsentinel.dto.user;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+
 
 public class UserUpdateProfileRequestDto {
     
@@ -21,9 +21,6 @@ public class UserUpdateProfileRequestDto {
     @NotBlank
     private String phoneNumber;
 
-    
-    @Size(min = 12, max = 128)
-    private String password;
 
 
     public String getFirstName() {
@@ -65,15 +62,6 @@ public class UserUpdateProfileRequestDto {
         this.phoneNumber = phoneNumber;
     }
 
-
-    public String getPassword() {
-        return password;
-    }
-
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     
 }
