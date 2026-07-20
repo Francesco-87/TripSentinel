@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.cicconesoftware.tripsentinel.dto.checkinmethod.CheckInMethodResponseDto;
 import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
+import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
 
 
 class CheckInMethodMapperTest {
@@ -17,7 +18,7 @@ class CheckInMethodMapperTest {
     void shouldMapCheckInMethodToCheckInMethodResponseDto() {
         // Arrange
         CheckInMethod checkInMethod = new CheckInMethod();
-        checkInMethod.setName("PHONE");
+        checkInMethod.setName(CheckInMethodType.PHONE);
 
         // Act
         CheckInMethodResponseDto responseDto =
@@ -25,7 +26,7 @@ class CheckInMethodMapperTest {
 
         // Assert
         assertNull(responseDto.getId());
-        assertEquals("PHONE", responseDto.getName());
+        assertEquals(CheckInMethodType.PHONE, responseDto.getName());
     }
 
     @Test

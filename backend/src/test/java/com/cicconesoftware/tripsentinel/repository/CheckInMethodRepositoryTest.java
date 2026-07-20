@@ -7,6 +7,8 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 
 import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
+import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
@@ -21,7 +23,7 @@ public class CheckInMethodRepositoryTest {
         // Arrange
         // Create a new check-in method entity and set its properties
         CheckInMethod checkInMethod = new CheckInMethod();
-        checkInMethod.setName("Test Check-In Method");
+        checkInMethod.setName(CheckInMethodType.PHONE);
         
 
         // Act
@@ -30,7 +32,7 @@ public class CheckInMethodRepositoryTest {
 
         // Assert
         assertThat(foundCheckInMethod).isNotNull();
-        assertThat(foundCheckInMethod.getName()).isEqualTo("Test Check-In Method");
+        assertThat(foundCheckInMethod.getName()).isEqualTo(CheckInMethodType.PHONE);
     }
     
 }

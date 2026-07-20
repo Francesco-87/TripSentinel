@@ -3,8 +3,12 @@ package com.cicconesoftware.tripsentinel.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,8 +26,9 @@ public class CheckInMethod {
     private Long id;
 
     // Display name for the method, such as SMS or phone call
-    @Column(name = "name", nullable = false, unique = true, length = 50)
-    private String name;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true)
+    private CheckInMethodType name;
 
     // Default constructor required by JPA
     public CheckInMethod() {}
@@ -41,11 +46,11 @@ public class CheckInMethod {
     }
     
 
-    public String getName() {
+    public CheckInMethodType getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(CheckInMethodType name) {
         this.name = name;
     }
 

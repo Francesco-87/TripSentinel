@@ -1,11 +1,13 @@
 package com.cicconesoftware.tripsentinel.dto.checkinmethod;
 
+import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
+
 public class CheckInMethodResponseDto {
 
     private final Long id;
-    private final String name;
+    private final CheckInMethodType name;
 
-    public CheckInMethodResponseDto(Long id, String name) {
+    public CheckInMethodResponseDto(Long id, CheckInMethodType name) {
         this.id = id;
         this.name = name;
     }
@@ -14,7 +16,7 @@ public class CheckInMethodResponseDto {
         return id;
     }
 
-    public String getName() {
+    public CheckInMethodType getName() {
         return name;
     }
     

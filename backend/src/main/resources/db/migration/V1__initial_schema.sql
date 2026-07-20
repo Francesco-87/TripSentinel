@@ -154,4 +154,7 @@ INSERT INTO roles (name) VALUES
 ('RESPONDER');
 
 INSERT INTO check_in_methods (name) VALUES
-('PHONE');
+('PHONE'),
+('SMS'),
+('EMAIL'),
+('APP');

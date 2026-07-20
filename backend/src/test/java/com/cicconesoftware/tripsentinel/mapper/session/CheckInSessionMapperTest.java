@@ -18,6 +18,7 @@ import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
 import com.cicconesoftware.tripsentinel.entity.CheckInSession;
 import com.cicconesoftware.tripsentinel.entity.SessionEvent;
 import com.cicconesoftware.tripsentinel.entity.User;
+import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
 import com.cicconesoftware.tripsentinel.entity.enums.SessionEventType;
 import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
 import com.cicconesoftware.tripsentinel.mapper.checkinmethod.CheckInMethodMapper;
@@ -132,8 +133,7 @@ class CheckInSessionMapperTest {
         User responder = new User();
 
         CheckInMethod checkInMethod = new CheckInMethod();
-        checkInMethod.setName("PHONE");
-
+        checkInMethod.setName(CheckInMethodType.PHONE);
         SessionEvent sessionEvent = new SessionEvent();
         sessionEvent.setEventType(SessionEventType.CREATED);
         sessionEvent.setNote("Session created.");
