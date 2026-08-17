@@ -77,7 +77,7 @@ public class UserMapper {
                 user.getStatus(),
                 user.getRoles()
                 .stream()
-                .map(Role::getName)
+                .map(role -> role.getName())
                 .collect(Collectors.toSet()),
                 user.getCreatedAt(),
                 user.getUpdatedAt()

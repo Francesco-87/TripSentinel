@@ -40,26 +40,34 @@ void shouldMapCreateRequestDtoToResponderAvailabilityEntity() {
 }
 
     @Test
-void shouldMapUpdateRequestDtoToResponderAvailabilityEntity() {
-    // Arrange
-    LocalDateTime availableFrom = LocalDateTime.now();
-    LocalDateTime availableUntil = availableFrom.plusHours(4);
+        void shouldUpdateResponderAvailabilityEntityFromUpdateRequestDto() {
+        // Arrange
+        LocalDateTime availableFrom = LocalDateTime.now();
+        LocalDateTime availableUntil = availableFrom.plusHours(4);
 
-    UpdateResponderAvailabilityRequestDto requestDto =
-            new UpdateResponderAvailabilityRequestDto();
-    requestDto.setAvailableFrom(availableFrom);
-    requestDto.setAvailableUntil(availableUntil);
-    requestDto.setStatus(AvailabilityStatus.UNAVAILABLE);
+        UpdateResponderAvailabilityRequestDto requestDto =
+                new UpdateResponderAvailabilityRequestDto();
+        requestDto.setAvailableFrom(availableFrom);
+        requestDto.setAvailableUntil(availableUntil);
+        requestDto.setStatus(AvailabilityStatus.UNAVAILABLE);
 
-    // Act
-    ResponderAvailability responderAvailability =
-            responderAvailabilityMapper.toResponderAvailability(requestDto);
+        ResponderAvailability responderAvailability =
+                new ResponderAvailability();
 
-    // Assert
-    assertEquals(availableFrom, responderAvailability.getAvailableFrom());
-    assertEquals(availableUntil, responderAvailability.getAvailableUntil());
-    assertEquals(AvailabilityStatus.UNAVAILABLE, responderAvailability.getStatus());
-}
+        // Act
+        responderAvailabilityMapper.updateResponderAvailability(
+                requestDto,
+                responderAvailability
+        );
+
+        // Assert
+        assertEquals(availableFrom, responderAvailability.getAvailableFrom());
+        assertEquals(availableUntil, responderAvailability.getAvailableUntil());
+        assertEquals(
+                AvailabilityStatus.UNAVAILABLE,
+                responderAvailability.getStatus()
+        );
+        }
 
     @Test
     void shouldMapResponderAvailabilityToResponseDto() {

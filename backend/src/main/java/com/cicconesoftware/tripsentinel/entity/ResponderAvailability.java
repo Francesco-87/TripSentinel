@@ -38,10 +38,10 @@ public class ResponderAvailability {
     private AvailabilityStatus status;
 
     // Audit timestamps for this availability record
-    @Column(name  = "created_at", nullable = false)
+    @Column(name = "created_at", insertable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at", insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
     // Default constructor required by JPA

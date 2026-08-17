@@ -24,19 +24,19 @@ public class ResponderAvailabilityMapper {
     }
 
 
-    public ResponderAvailability toResponderAvailability(UpdateResponderAvailabilityRequestDto dto) {
-          // Return null if input is null to prevent null pointer exceptions
-        if (dto == null) {
-            return null;
+    public void updateResponderAvailability(
+        UpdateResponderAvailabilityRequestDto dto,
+        ResponderAvailability entity) {
+
+         if (dto == null || entity == null) {
+                return;
+            }
+
+            entity.setAvailableFrom(dto.getAvailableFrom());
+            entity.setAvailableUntil(dto.getAvailableUntil());
+            entity.setStatus(dto.getStatus());
+    
         }
-          // Create new entity and map all DTO fields to corresponding entity fields
-        ResponderAvailability entity = new ResponderAvailability();
-       
-        entity.setAvailableFrom(dto.getAvailableFrom());
-        entity.setAvailableUntil(dto.getAvailableUntil());
-        entity.setStatus(dto.getStatus());
-        return entity;
-    }
 
 
 
