@@ -8,7 +8,6 @@ import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserUpdateProfileRequestDto;
-import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
 
 @Component
@@ -19,6 +18,8 @@ public class UserMapper {
             return null;
         }
         User user = new User();
+
+        // TODO: hash password when authentication/security is implemented
         
         user.setFirstName(userRequestDto.getFirstName());
         user.setLastName(userRequestDto.getLastName());
@@ -29,34 +30,32 @@ public class UserMapper {
         return user;
     }
 
-        public User toUserEntity(AdminUpdateUserRequestDto userRequestDto) {
-        if (userRequestDto == null) {
-            return null;
-        }
-        User user = new User();
-    
-        user.setFirstName(userRequestDto.getFirstName());
-        user.setLastName(userRequestDto.getLastName());
-        user.setEmail(userRequestDto.getEmail());
-        user.setPhoneNumber(userRequestDto.getPhoneNumber());
-        user.setStatus(userRequestDto.getStatus());
-       
-        return user;
+    public void updateUserFromAdminDto(
+        AdminUpdateUserRequestDto dto,
+        User user) {
+
+    if (dto == null || user == null) {
+        return;
     }
 
+    user.setFirstName(dto.getFirstName());
+    user.setLastName(dto.getLastName());
+    user.setEmail(dto.getEmail());
+    user.setPhoneNumber(dto.getPhoneNumber());
+    user.setStatus(dto.getStatus());
+}
 
-    public User toUserEntity(UserUpdateProfileRequestDto userRequestDto) {
-        if (userRequestDto == null) {
-            return null;
+
+    public void updateUserFromUserDto(UserUpdateProfileRequestDto userRequestDto, User user) {
+        if (userRequestDto == null || user == null) {
+            return;
         }
-        User user = new User();
     
         user.setFirstName(userRequestDto.getFirstName());
         user.setLastName(userRequestDto.getLastName());
         user.setEmail(userRequestDto.getEmail());
         user.setPhoneNumber(userRequestDto.getPhoneNumber());
 
-        return user;
     }
 
 
