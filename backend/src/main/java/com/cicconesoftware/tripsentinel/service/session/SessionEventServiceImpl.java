@@ -38,4 +38,8 @@ public class SessionEventServiceImpl implements SessionEventService {
             .map(mapper::toSessionEventResponseDto)
             .toList();
     }
+
+    /**TODO: Implement the following methods in the future if needed
+     * SessionEvent Session_CANCELED in the CheckInSessionServiceImpl class
+     */
 }

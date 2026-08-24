@@ -59,19 +59,19 @@ public class CheckInSessionMapper {
         return checkInSession;
     }
 
-     public CheckInSession toCheckInSessionEntity(UpdateCheckInSessionRequestDto dto){
-         if (dto == null) {
-            return null;
-        }
-        CheckInSession checkInSession = new CheckInSession();
+     public void updateCheckInSession(
+        UpdateCheckInSessionRequestDto dto,
+        CheckInSession session) {
 
-        checkInSession.setStartAt(dto.getStartAt());
-        checkInSession.setExpectedReturnAt(dto.getExpectedReturnAt());
-        checkInSession.setLatestCheckInAt(dto.getLatestCheckInAt());
-        checkInSession.setLocationDescription(dto.getLocationDescription());
-        checkInSession.setImportantNotes(dto.getImportantNotes());
-     
-        return checkInSession;
+    if (dto == null || session == null) {
+        return;
+    }
+
+    session.setStartAt(dto.getStartAt());
+    session.setExpectedReturnAt(dto.getExpectedReturnAt());
+    session.setLatestCheckInAt(dto.getLatestCheckInAt());
+    session.setLocationDescription(dto.getLocationDescription());
+    session.setImportantNotes(dto.getImportantNotes());
     }
 
 

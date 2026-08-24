@@ -47,11 +47,11 @@ class UserMapperTest {
 
     @Test
     void shouldReturnNullWhenAdminCreateUserRequestDtoIsNull() {
-        assertNull(userMapper.toUserEntity((AdminCreateUserRequestDto) null));
+        assertNull(userMapper.toUserEntity(null));
     }
 
     @Test
-    void shouldMapAdminUpdateUserRequestDtoToUserEntity() {
+    void shouldUpdateUserFromAdminDto() {
         // Arrange
         AdminUpdateUserRequestDto requestDto = new AdminUpdateUserRequestDto();
         requestDto.setFirstName("Jane");
@@ -60,8 +60,10 @@ class UserMapperTest {
         requestDto.setPhoneNumber("87654321");
         requestDto.setStatus(UserStatus.INACTIVE);
 
+        User user = new User();
+
         // Act
-        User user = userMapper.toUserEntity(requestDto);
+        userMapper.updateUserFromAdminDto(requestDto, user);
 
         // Assert
         assertEquals("Jane", user.getFirstName());
@@ -72,21 +74,32 @@ class UserMapperTest {
     }
 
     @Test
-    void shouldReturnNullWhenAdminUpdateUserRequestDtoIsNull() {
-        assertNull(userMapper.toUserEntity((AdminUpdateUserRequestDto) null));
+    void shouldDoNothingWhenAdminUpdateDtoIsNull() {
+        // Arrange
+        User user = new User();
+        user.setFirstName("Existing");
+
+        // Act
+        userMapper.updateUserFromAdminDto(null, user);
+
+        // Assert
+        assertEquals("Existing", user.getFirstName());
     }
 
     @Test
-    void shouldMapUserUpdateProfileRequestDtoToUserEntity() {
+    void shouldUpdateUserFromUserProfileDto() {
         // Arrange
-        UserUpdateProfileRequestDto requestDto = new UserUpdateProfileRequestDto();
+        UserUpdateProfileRequestDto requestDto =
+                new UserUpdateProfileRequestDto();
         requestDto.setFirstName("Max");
         requestDto.setLastName("Mustermann");
         requestDto.setEmail("max@test.com");
         requestDto.setPhoneNumber("99999999");
 
+        User user = new User();
+
         // Act
-        User user = userMapper.toUserEntity(requestDto);
+        userMapper.updateUserFromUserDto(requestDto, user);
 
         // Assert
         assertEquals("Max", user.getFirstName());
@@ -96,8 +109,16 @@ class UserMapperTest {
     }
 
     @Test
-    void shouldReturnNullWhenUserUpdateProfileRequestDtoIsNull() {
-        assertNull(userMapper.toUserEntity((UserUpdateProfileRequestDto) null));
+    void shouldDoNothingWhenUserUpdateProfileDtoIsNull() {
+        // Arrange
+        User user = new User();
+        user.setFirstName("Existing");
+
+        // Act
+        userMapper.updateUserFromUserDto(null, user);
+
+        // Assert
+        assertEquals("Existing", user.getFirstName());
     }
 
     @Test

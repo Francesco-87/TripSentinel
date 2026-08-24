@@ -37,7 +37,9 @@ class CheckInSessionMapperTest {
         LocalDateTime expectedReturnAt = startAt.plusHours(5);
         LocalDateTime latestCheckInAt = startAt.plusHours(6);
 
-        AdminCreateCheckInSessionRequestDto requestDto = new AdminCreateCheckInSessionRequestDto();
+        AdminCreateCheckInSessionRequestDto requestDto =
+                new AdminCreateCheckInSessionRequestDto();
+
         requestDto.setStartAt(startAt);
         requestDto.setExpectedReturnAt(expectedReturnAt);
         requestDto.setLatestCheckInAt(latestCheckInAt);
@@ -45,7 +47,8 @@ class CheckInSessionMapperTest {
         requestDto.setImportantNotes("Take warm clothes.");
 
         // Act
-        CheckInSession session = checkInSessionMapper.toCheckInSessionEntity(requestDto);
+        CheckInSession session =
+                checkInSessionMapper.toCheckInSessionEntity(requestDto);
 
         // Assert
         assertEquals(startAt, session.getStartAt());
@@ -57,7 +60,9 @@ class CheckInSessionMapperTest {
 
     @Test
     void shouldReturnNullWhenAdminCreateCheckInSessionRequestDtoIsNull() {
-        assertNull(checkInSessionMapper.toCheckInSessionEntity((AdminCreateCheckInSessionRequestDto) null));
+        assertNull(
+                checkInSessionMapper.toCheckInSessionEntity(
+                        (AdminCreateCheckInSessionRequestDto) null));
     }
 
     @Test
@@ -67,7 +72,9 @@ class CheckInSessionMapperTest {
         LocalDateTime expectedReturnAt = startAt.plusHours(5);
         LocalDateTime latestCheckInAt = startAt.plusHours(6);
 
-        CreateCheckInSessionRequestDto requestDto = new CreateCheckInSessionRequestDto();
+        CreateCheckInSessionRequestDto requestDto =
+                new CreateCheckInSessionRequestDto();
+
         requestDto.setStartAt(startAt);
         requestDto.setExpectedReturnAt(expectedReturnAt);
         requestDto.setLatestCheckInAt(latestCheckInAt);
@@ -75,7 +82,8 @@ class CheckInSessionMapperTest {
         requestDto.setImportantNotes("Take warm clothes.");
 
         // Act
-        CheckInSession session = checkInSessionMapper.toCheckInSessionEntity(requestDto);
+        CheckInSession session =
+                checkInSessionMapper.toCheckInSessionEntity(requestDto);
 
         // Assert
         assertEquals(startAt, session.getStartAt());
@@ -87,25 +95,32 @@ class CheckInSessionMapperTest {
 
     @Test
     void shouldReturnNullWhenCreateCheckInSessionRequestDtoIsNull() {
-        assertNull(checkInSessionMapper.toCheckInSessionEntity((CreateCheckInSessionRequestDto) null));
+        assertNull(
+                checkInSessionMapper.toCheckInSessionEntity(
+                        (CreateCheckInSessionRequestDto) null));
     }
 
     @Test
-    void shouldMapUpdateCheckInSessionRequestDtoToEntity() {
+    void shouldUpdateCheckInSessionFromUpdateRequestDto() {
         // Arrange
         LocalDateTime startAt = LocalDateTime.now();
         LocalDateTime expectedReturnAt = startAt.plusHours(5);
         LocalDateTime latestCheckInAt = startAt.plusHours(6);
 
-        UpdateCheckInSessionRequestDto requestDto = new UpdateCheckInSessionRequestDto();
+        UpdateCheckInSessionRequestDto requestDto =
+                new UpdateCheckInSessionRequestDto();
+
         requestDto.setStartAt(startAt);
         requestDto.setExpectedReturnAt(expectedReturnAt);
         requestDto.setLatestCheckInAt(latestCheckInAt);
         requestDto.setLocationDescription("Nordmarka");
         requestDto.setImportantNotes("Take warm clothes.");
 
+        CheckInSession session = new CheckInSession();
+        session.setStatus(SessionStatus.PLANNED);
+
         // Act
-        CheckInSession session = checkInSessionMapper.toCheckInSessionEntity(requestDto);
+        checkInSessionMapper.updateCheckInSession(requestDto, session);
 
         // Assert
         assertEquals(startAt, session.getStartAt());
@@ -113,11 +128,22 @@ class CheckInSessionMapperTest {
         assertEquals(latestCheckInAt, session.getLatestCheckInAt());
         assertEquals("Nordmarka", session.getLocationDescription());
         assertEquals("Take warm clothes.", session.getImportantNotes());
+
+        // Existing fields remain untouched
+        assertEquals(SessionStatus.PLANNED, session.getStatus());
     }
 
     @Test
-    void shouldReturnNullWhenUpdateCheckInSessionRequestDtoIsNull() {
-        assertNull(checkInSessionMapper.toCheckInSessionEntity((UpdateCheckInSessionRequestDto) null));
+    void shouldDoNothingWhenUpdateCheckInSessionRequestDtoIsNull() {
+        // Arrange
+        CheckInSession session = new CheckInSession();
+        session.setLocationDescription("Existing location");
+
+        // Act
+        checkInSessionMapper.updateCheckInSession(null, session);
+
+        // Assert
+        assertEquals("Existing location", session.getLocationDescription());
     }
 
     @Test
@@ -134,6 +160,7 @@ class CheckInSessionMapperTest {
 
         CheckInMethod checkInMethod = new CheckInMethod();
         checkInMethod.setName(CheckInMethodType.PHONE);
+
         SessionEvent sessionEvent = new SessionEvent();
         sessionEvent.setEventType(SessionEventType.CREATED);
         sessionEvent.setNote("Session created.");
@@ -172,12 +199,16 @@ class CheckInSessionMapperTest {
         assertEquals(updatedAt, responseDto.getUpdatedAt());
 
         assertEquals(1, responseDto.getEvents().size());
-        SessionEventResponseDto eventDto = responseDto.getEvents().iterator().next();
+        SessionEventResponseDto eventDto =
+                responseDto.getEvents().iterator().next();
+
         assertEquals(SessionEventType.CREATED, eventDto.getType());
 
         assertEquals(1, responseDto.getCheckInMethods().size());
-        CheckInMethodResponseDto methodDto = responseDto.getCheckInMethods().iterator().next();
-        assertEquals("PHONE", methodDto.getName());
+        CheckInMethodResponseDto methodDto =
+                responseDto.getCheckInMethods().iterator().next();
+
+        assertEquals(CheckInMethodType.PHONE, methodDto.getName());
     }
 
     @Test

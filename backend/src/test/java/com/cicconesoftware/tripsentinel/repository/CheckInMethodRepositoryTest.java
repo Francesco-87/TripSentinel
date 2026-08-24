@@ -17,22 +17,17 @@ public class CheckInMethodRepositoryTest {
 
     @Autowired
     private CheckInMethodRepository checkInMethodRepository;
+@Test
+void shouldFindCheckInMethodByName() {
+    // Act
+    CheckInMethod checkInMethod =
+            checkInMethodRepository.findByName(CheckInMethodType.PHONE)
+                    .orElse(null);
 
-    @Test
-    void shouldSaveAndFindCheckInMethod() {
-        // Arrange
-        // Create a new check-in method entity and set its properties
-        CheckInMethod checkInMethod = new CheckInMethod();
-        checkInMethod.setName(CheckInMethodType.PHONE);
-        
-
-        // Act
-        CheckInMethod savedCheckInMethod = checkInMethodRepository.save(checkInMethod);
-        CheckInMethod foundCheckInMethod = checkInMethodRepository.findById(savedCheckInMethod.getId()).orElse(null);
-
-        // Assert
-        assertThat(foundCheckInMethod).isNotNull();
-        assertThat(foundCheckInMethod.getName()).isEqualTo(CheckInMethodType.PHONE);
-    }
+    // Assert
+    assertThat(checkInMethod).isNotNull();
+    assertThat(checkInMethod.getName())
+            .isEqualTo(CheckInMethodType.PHONE);
+}
     
 }

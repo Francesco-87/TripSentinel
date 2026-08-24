@@ -14,6 +14,7 @@ import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
 import com.cicconesoftware.tripsentinel.entity.CheckInSession;
 import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
+import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
 import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
@@ -118,6 +119,6 @@ public class CheckInSessionRepositoryTest {
                 .iterator()
                 .next()
                 .getName())
-                .isEqualTo("PHONE");
+                .isEqualTo(CheckInMethodType.PHONE);
     }
 }
