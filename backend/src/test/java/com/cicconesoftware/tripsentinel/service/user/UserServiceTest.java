@@ -15,6 +15,7 @@ import org.mockito.MockitoAnnotations;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserUpdateProfileRequestDto;
 import com.cicconesoftware.tripsentinel.entity.Role;
@@ -106,6 +107,47 @@ class UserServiceTest {
 
         verify(userRepository).findAll();
     }
+
+    @Test
+void shouldCreateCustomerUser() {
+    // Arrange
+    CreateUserRequestDto dto =
+            new CreateUserRequestDto();
+
+    dto.setFirstName("John");
+    dto.setLastName("Doe");
+    dto.setEmail("john@test.com");
+    dto.setPhoneNumber("12345678");
+    dto.setPassword("VerySecurePassword");
+
+    Role customerRole = new Role();
+    customerRole.setName(RoleType.CUSTOMER);
+
+    when(roleRepository.findByName(RoleType.CUSTOMER))
+            .thenReturn(Optional.of(customerRole));
+
+    when(userRepository.save(
+            org.mockito.ArgumentMatchers.any(User.class)))
+            .thenAnswer(invocation -> invocation.getArgument(0));
+
+    // Act
+    UserResponseDto result = userService.create(dto);
+
+    // Assert
+    assertEquals("John", result.getFirstName());
+    assertEquals("john@test.com", result.getEmail());
+    assertEquals(UserStatus.ACTIVE, result.getStatus());
+    assertEquals(
+            Set.of(RoleType.CUSTOMER),
+            result.getRoles()
+    );
+
+    verify(roleRepository)
+            .findByName(RoleType.CUSTOMER);
+
+    verify(userRepository)
+            .save(org.mockito.ArgumentMatchers.any(User.class));
+}
 
     @Test
     void shouldAdminCreateUser() {

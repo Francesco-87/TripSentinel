@@ -8,10 +8,13 @@ import org.springframework.stereotype.Service;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserUpdateProfileRequestDto;
 import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
+import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
+import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
 import com.cicconesoftware.tripsentinel.mapper.user.UserMapper;
 import com.cicconesoftware.tripsentinel.repository.RoleRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
@@ -48,6 +51,22 @@ public class UserServiceImpl implements UserService {
                 .map(userMapper::toUserResponseDto)
                 .toList();
     }
+
+    @Override
+public UserResponseDto create(CreateUserRequestDto dto) {
+
+    User user = userMapper.toUserEntity(dto);
+
+    Role customerRole = roleRepository.findByName(RoleType.CUSTOMER)
+        .orElseThrow();
+
+    user.setRoles(Set.of(customerRole));
+    user.setStatus(UserStatus.ACTIVE);
+
+    User savedUser = userRepository.save(user);
+
+    return userMapper.toUserResponseDto(savedUser);
+}
 
     @Override
 public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {

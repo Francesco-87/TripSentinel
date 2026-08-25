@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserUpdateProfileRequestDto;
 import com.cicconesoftware.tripsentinel.entity.Role;
@@ -47,7 +48,38 @@ class UserMapperTest {
 
     @Test
     void shouldReturnNullWhenAdminCreateUserRequestDtoIsNull() {
-        assertNull(userMapper.toUserEntity(null));
+        assertNull(userMapper.toUserEntity(
+                (AdminCreateUserRequestDto) null
+        ));
+    }
+
+    @Test
+    void shouldMapCreateUserRequestDtoToUserEntity() {
+        // Arrange
+        CreateUserRequestDto requestDto = new CreateUserRequestDto();
+        requestDto.setFirstName("John");
+        requestDto.setLastName("Doe");
+        requestDto.setEmail("john.doe@test.com");
+        requestDto.setPhoneNumber("12345678");
+        requestDto.setPassword("VerySecurePassword");
+
+        // Act
+        User user = userMapper.toUserEntity(requestDto);
+
+        // Assert
+        assertEquals("John", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("john.doe@test.com", user.getEmail());
+        assertEquals("12345678", user.getPhoneNumber());
+        assertEquals("VerySecurePassword", user.getPasswordHash());
+        assertNull(user.getStatus());
+    }
+
+    @Test
+    void shouldReturnNullWhenCreateUserRequestDtoIsNull() {
+        assertNull(userMapper.toUserEntity(
+                (CreateUserRequestDto) null
+        ));
     }
 
     @Test
@@ -91,6 +123,7 @@ class UserMapperTest {
         // Arrange
         UserUpdateProfileRequestDto requestDto =
                 new UserUpdateProfileRequestDto();
+
         requestDto.setFirstName("Max");
         requestDto.setLastName("Mustermann");
         requestDto.setEmail("max@test.com");
