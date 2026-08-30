@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.AdminPatchUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
@@ -85,10 +86,36 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
     return userMapper.toUserResponseDto(savedUser);
 }
 
+   @Override
+    public UserResponseDto adminPatch(Long id, AdminPatchUserRequestDto dto) {
+        User existingUser = userRepository.findById(id).orElseThrow();
+
+        userMapper.updateUserFromAdminPatchDto(dto, existingUser);
+
+        if (dto.getRoles() != null) {
+            Set<Role> roles = dto.getRoles().stream()
+                    .map(roleType -> roleRepository.findByName(roleType)
+                            .orElseThrow())
+                    .collect(Collectors.toSet());
+
+            existingUser.setRoles(roles);
+        }
+
+        User savedUser = userRepository.save(existingUser);
+
+        return userMapper.toUserResponseDto(savedUser);
+    }
+
     @Override
     public UserResponseDto adminUpdate(Long id, AdminUpdateUserRequestDto dto) {
         User existingUser = userRepository.findById(id).orElseThrow();
         userMapper.updateUserFromAdminDto(dto, existingUser);
+       Set<Role> roles = dto.getRoles().stream()
+        .map(roleType -> roleRepository.findByName(roleType)
+                .orElseThrow())
+        .collect(Collectors.toSet());
+
+existingUser.setRoles(roles);
         User savedUser = userRepository.save(existingUser);
         return userMapper.toUserResponseDto(savedUser);
     }

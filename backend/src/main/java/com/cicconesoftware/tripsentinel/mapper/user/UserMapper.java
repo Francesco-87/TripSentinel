@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.AdminPatchUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
@@ -78,6 +79,31 @@ public class UserMapper {
         user.setLastName(userRequestDto.getLastName());
         user.setEmail(userRequestDto.getEmail());
         user.setPhoneNumber(userRequestDto.getPhoneNumber());
+    }
+
+    public void updateUserFromAdminPatchDto(
+            AdminPatchUserRequestDto dto,
+            User user) {
+
+        if (dto == null || user == null) {
+            return;
+        }
+
+        if (dto.getFirstName() != null) {
+            user.setFirstName(dto.getFirstName());
+        }
+        if (dto.getLastName() != null) {
+            user.setLastName(dto.getLastName());
+        }
+        if (dto.getEmail() != null) {
+            user.setEmail(dto.getEmail());
+        }
+        if (dto.getPhoneNumber() != null) {
+            user.setPhoneNumber(dto.getPhoneNumber());
+        }
+        if (dto.getStatus() != null) {
+            user.setStatus(dto.getStatus());
+        }
     }
 
     public UserResponseDto toUserResponseDto(User user) {

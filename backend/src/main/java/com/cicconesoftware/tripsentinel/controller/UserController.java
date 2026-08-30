@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.AdminPatchUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserUpdateProfileRequestDto;
@@ -75,6 +77,12 @@ public class UserController {
     @GetMapping("/email")
     public UserResponseDto getUserByEmail(@RequestParam String email) {
         return userService.getByEmail(email);
+    }
+
+    @PatchMapping("/admin/{id}")
+    public UserResponseDto adminPatchUser(@PathVariable Long id, @RequestBody @Valid AdminPatchUserRequestDto updatedUser) {
+        // Patches user data with validated input and returns updated user
+        return userService.adminPatch(id, updatedUser);
     }
 
     @PutMapping("/admin/{id}")

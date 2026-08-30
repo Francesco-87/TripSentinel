@@ -3,6 +3,7 @@ package com.cicconesoftware.tripsentinel.service.user;
 import java.util.List;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.AdminPatchUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
@@ -17,6 +18,7 @@ public interface UserService {
      UserResponseDto create(CreateUserRequestDto dto);
 
     UserResponseDto adminCreate(AdminCreateUserRequestDto dto);
+    UserResponseDto adminPatch(Long id, AdminPatchUserRequestDto dto);
     UserResponseDto adminUpdate(Long id, AdminUpdateUserRequestDto dto);
     UserResponseDto userUpdate(Long id, UserUpdateProfileRequestDto dto);
 

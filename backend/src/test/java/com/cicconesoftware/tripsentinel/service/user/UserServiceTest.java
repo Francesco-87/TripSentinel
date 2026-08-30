@@ -1,6 +1,8 @@
 package com.cicconesoftware.tripsentinel.service.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -14,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.AdminPatchUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
@@ -82,7 +85,8 @@ class UserServiceTest {
         // Assert
         assertEquals("john@test.com", result.getEmail());
 
-        verify(userRepository).findByEmail("john@test.com");
+        verify(userRepository)
+                .findByEmail("john@test.com");
     }
 
     @Test
@@ -98,56 +102,74 @@ class UserServiceTest {
                 .thenReturn(List.of(first, second));
 
         // Act
-        List<UserResponseDto> result = userService.getAll();
+        List<UserResponseDto> result =
+                userService.getAll();
 
         // Assert
         assertEquals(2, result.size());
-        assertEquals("John", result.get(0).getFirstName());
-        assertEquals("Jane", result.get(1).getFirstName());
+        assertEquals(
+                "John",
+                result.get(0).getFirstName()
+        );
+        assertEquals(
+                "Jane",
+                result.get(1).getFirstName()
+        );
 
         verify(userRepository).findAll();
     }
 
     @Test
-void shouldCreateCustomerUser() {
-    // Arrange
-    CreateUserRequestDto dto =
-            new CreateUserRequestDto();
+    void shouldCreateCustomerUser() {
+        // Arrange
+        CreateUserRequestDto dto =
+                new CreateUserRequestDto();
 
-    dto.setFirstName("John");
-    dto.setLastName("Doe");
-    dto.setEmail("john@test.com");
-    dto.setPhoneNumber("12345678");
-    dto.setPassword("VerySecurePassword");
+        dto.setFirstName("John");
+        dto.setLastName("Doe");
+        dto.setEmail("john@test.com");
+        dto.setPhoneNumber("12345678");
+        dto.setPassword("VerySecurePassword");
 
-    Role customerRole = new Role();
-    customerRole.setName(RoleType.CUSTOMER);
+        Role customerRole = new Role();
+        customerRole.setName(RoleType.CUSTOMER);
 
-    when(roleRepository.findByName(RoleType.CUSTOMER))
-            .thenReturn(Optional.of(customerRole));
+        when(roleRepository.findByName(RoleType.CUSTOMER))
+                .thenReturn(Optional.of(customerRole));
 
-    when(userRepository.save(
-            org.mockito.ArgumentMatchers.any(User.class)))
-            .thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(
+                        invocation -> invocation.getArgument(0)
+                );
 
-    // Act
-    UserResponseDto result = userService.create(dto);
+        // Act
+        UserResponseDto result =
+                userService.create(dto);
 
-    // Assert
-    assertEquals("John", result.getFirstName());
-    assertEquals("john@test.com", result.getEmail());
-    assertEquals(UserStatus.ACTIVE, result.getStatus());
-    assertEquals(
-            Set.of(RoleType.CUSTOMER),
-            result.getRoles()
-    );
+        // Assert
+        assertEquals(
+                "John",
+                result.getFirstName()
+        );
+        assertEquals(
+                "john@test.com",
+                result.getEmail()
+        );
+        assertEquals(
+                UserStatus.ACTIVE,
+                result.getStatus()
+        );
+        assertEquals(
+                Set.of(RoleType.CUSTOMER),
+                result.getRoles()
+        );
 
-    verify(roleRepository)
-            .findByName(RoleType.CUSTOMER);
+        verify(roleRepository)
+                .findByName(RoleType.CUSTOMER);
 
-    verify(userRepository)
-            .save(org.mockito.ArgumentMatchers.any(User.class));
-}
+        verify(userRepository)
+                .save(any(User.class));
+    }
 
     @Test
     void shouldAdminCreateUser() {
@@ -169,21 +191,34 @@ void shouldCreateCustomerUser() {
         when(roleRepository.findByName(RoleType.CUSTOMER))
                 .thenReturn(Optional.of(customerRole));
 
-        when(userRepository.save(
-                org.mockito.ArgumentMatchers.any(User.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(
+                        invocation -> invocation.getArgument(0)
+                );
 
         // Act
-        UserResponseDto result = userService.adminCreate(dto);
+        UserResponseDto result =
+                userService.adminCreate(dto);
 
         // Assert
-        assertEquals("John", result.getFirstName());
-        assertEquals("john@test.com", result.getEmail());
-        assertEquals(Set.of(RoleType.CUSTOMER), result.getRoles());
+        assertEquals(
+                "John",
+                result.getFirstName()
+        );
+        assertEquals(
+                "john@test.com",
+                result.getEmail()
+        );
+        assertEquals(
+                Set.of(RoleType.CUSTOMER),
+                result.getRoles()
+        );
 
-        verify(roleRepository).findByName(RoleType.CUSTOMER);
-        verify(userRepository).save(
-                org.mockito.ArgumentMatchers.any(User.class));
+        verify(roleRepository)
+                .findByName(RoleType.CUSTOMER);
+
+        verify(userRepository)
+                .save(any(User.class));
     }
 
     @Test
@@ -199,9 +234,16 @@ void shouldCreateCustomerUser() {
         dto.setEmail("jane@test.com");
         dto.setPhoneNumber("87654321");
         dto.setStatus(UserStatus.INACTIVE);
+        dto.setRoles(Set.of(RoleType.RESPONDER));
+
+        Role responderRole = new Role();
+        responderRole.setName(RoleType.RESPONDER);
 
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(existingUser));
+
+        when(roleRepository.findByName(RoleType.RESPONDER))
+                .thenReturn(Optional.of(responderRole));
 
         when(userRepository.save(existingUser))
                 .thenReturn(existingUser);
@@ -211,12 +253,130 @@ void shouldCreateCustomerUser() {
                 userService.adminUpdate(1L, dto);
 
         // Assert
-        assertEquals("Jane", result.getFirstName());
-        assertEquals("jane@test.com", result.getEmail());
-        assertEquals(UserStatus.INACTIVE, result.getStatus());
+        assertEquals(
+                "Jane",
+                result.getFirstName()
+        );
+        assertEquals(
+                "jane@test.com",
+                result.getEmail()
+        );
+        assertEquals(
+                UserStatus.INACTIVE,
+                result.getStatus()
+        );
+        assertEquals(
+                Set.of(RoleType.RESPONDER),
+                result.getRoles()
+        );
 
         verify(userRepository).findById(1L);
-        verify(userRepository).save(existingUser);
+
+        verify(roleRepository)
+                .findByName(RoleType.RESPONDER);
+
+        verify(userRepository)
+                .save(existingUser);
+    }
+
+    @Test
+    void shouldAdminPatchUserWithoutChangingRoles() {
+        // Arrange
+        User existingUser = createUser();
+
+        AdminPatchUserRequestDto dto =
+                new AdminPatchUserRequestDto();
+
+        dto.setStatus(UserStatus.INACTIVE);
+
+        when(userRepository.findById(1L))
+                .thenReturn(Optional.of(existingUser));
+
+        when(userRepository.save(existingUser))
+                .thenReturn(existingUser);
+
+        // Act
+        UserResponseDto result =
+                userService.adminPatch(1L, dto);
+
+        // Assert
+        assertEquals(
+                "John",
+                result.getFirstName()
+        );
+        assertEquals(
+                "Doe",
+                result.getLastName()
+        );
+        assertEquals(
+                "john@test.com",
+                result.getEmail()
+        );
+        assertEquals(
+                UserStatus.INACTIVE,
+                result.getStatus()
+        );
+        assertEquals(
+                Set.of(RoleType.CUSTOMER),
+                result.getRoles()
+        );
+
+        verify(userRepository).findById(1L);
+
+        verify(roleRepository, never())
+                .findByName(any(RoleType.class));
+
+        verify(userRepository)
+                .save(existingUser);
+    }
+
+    @Test
+    void shouldAdminPatchUserRoles() {
+        // Arrange
+        User existingUser = createUser();
+
+        AdminPatchUserRequestDto dto =
+                new AdminPatchUserRequestDto();
+
+        dto.setRoles(Set.of(RoleType.RESPONDER));
+
+        Role responderRole = new Role();
+        responderRole.setName(RoleType.RESPONDER);
+
+        when(userRepository.findById(1L))
+                .thenReturn(Optional.of(existingUser));
+
+        when(roleRepository.findByName(RoleType.RESPONDER))
+                .thenReturn(Optional.of(responderRole));
+
+        when(userRepository.save(existingUser))
+                .thenReturn(existingUser);
+
+        // Act
+        UserResponseDto result =
+                userService.adminPatch(1L, dto);
+
+        // Assert
+        assertEquals(
+                "John",
+                result.getFirstName()
+        );
+        assertEquals(
+                UserStatus.ACTIVE,
+                result.getStatus()
+        );
+        assertEquals(
+                Set.of(RoleType.RESPONDER),
+                result.getRoles()
+        );
+
+        verify(userRepository).findById(1L);
+
+        verify(roleRepository)
+                .findByName(RoleType.RESPONDER);
+
+        verify(userRepository)
+                .save(existingUser);
     }
 
     @Test
@@ -243,13 +403,26 @@ void shouldCreateCustomerUser() {
                 userService.userUpdate(1L, dto);
 
         // Assert
-        assertEquals("Max", result.getFirstName());
-        assertEquals("Mustermann", result.getLastName());
-        assertEquals("max@test.com", result.getEmail());
-        assertEquals("99999999", result.getPhoneNumber());
+        assertEquals(
+                "Max",
+                result.getFirstName()
+        );
+        assertEquals(
+                "Mustermann",
+                result.getLastName()
+        );
+        assertEquals(
+                "max@test.com",
+                result.getEmail()
+        );
+        assertEquals(
+                "99999999",
+                result.getPhoneNumber()
+        );
 
         verify(userRepository).findById(1L);
-        verify(userRepository).save(existingUser);
+        verify(userRepository)
+                .save(existingUser);
     }
 
     private User createUser() {

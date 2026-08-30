@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.AdminPatchUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
@@ -29,6 +31,7 @@ import com.cicconesoftware.tripsentinel.dto.user.UserUpdateProfileRequestDto;
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
 import com.cicconesoftware.tripsentinel.service.user.UserService;
+
 import tools.jackson.databind.ObjectMapper;
 
 class UserControllerTest {
@@ -220,6 +223,45 @@ class UserControllerTest {
         verify(userService).adminUpdate(
                 eq(1L),
                 any(AdminUpdateUserRequestDto.class)
+        );
+    }
+
+    @Test
+    void shouldAdminPatchUser() throws Exception {
+        // Arrange
+        AdminPatchUserRequestDto dto =
+                new AdminPatchUserRequestDto();
+
+        dto.setStatus(UserStatus.INACTIVE);
+
+        UserResponseDto response = new UserResponseDto(
+                1L,
+                "John",
+                "Doe",
+                "john@test.com",
+                "12345678",
+                UserStatus.INACTIVE,
+                Set.of(RoleType.CUSTOMER),
+                null,
+                null
+        );
+
+        when(userService.adminPatch(
+                eq(1L),
+                any(AdminPatchUserRequestDto.class)))
+                .thenReturn(response);
+
+        // Act + Assert
+        mockMvc.perform(patch("/api/users/admin/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName").value("John"))
+                .andExpect(jsonPath("$.status").value("INACTIVE"));
+
+        verify(userService).adminPatch(
+                eq(1L),
+                any(AdminPatchUserRequestDto.class)
         );
     }
 

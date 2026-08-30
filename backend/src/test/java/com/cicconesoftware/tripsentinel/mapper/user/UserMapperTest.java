@@ -10,6 +10,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
+import com.cicconesoftware.tripsentinel.dto.user.AdminPatchUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminUpdateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.UserResponseDto;
@@ -85,7 +86,9 @@ class UserMapperTest {
     @Test
     void shouldUpdateUserFromAdminDto() {
         // Arrange
-        AdminUpdateUserRequestDto requestDto = new AdminUpdateUserRequestDto();
+        AdminUpdateUserRequestDto requestDto =
+                new AdminUpdateUserRequestDto();
+
         requestDto.setFirstName("Jane");
         requestDto.setLastName("Doe");
         requestDto.setEmail("jane.doe@test.com");
@@ -119,6 +122,52 @@ class UserMapperTest {
     }
 
     @Test
+    void shouldPatchOnlyProvidedAdminFields() {
+        // Arrange
+        AdminPatchUserRequestDto requestDto =
+                new AdminPatchUserRequestDto();
+
+        requestDto.setFirstName("Jane");
+        requestDto.setStatus(UserStatus.INACTIVE);
+
+        User user = new User();
+        user.setFirstName("John");
+        user.setLastName("Doe");
+        user.setEmail("john.doe@test.com");
+        user.setPhoneNumber("12345678");
+        user.setStatus(UserStatus.ACTIVE);
+
+        // Act
+        userMapper.updateUserFromAdminPatchDto(
+                requestDto,
+                user
+        );
+
+        // Assert
+        assertEquals("Jane", user.getFirstName());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("john.doe@test.com", user.getEmail());
+        assertEquals("12345678", user.getPhoneNumber());
+        assertEquals(UserStatus.INACTIVE, user.getStatus());
+    }
+
+    @Test
+    void shouldDoNothingWhenAdminPatchDtoIsNull() {
+        // Arrange
+        User user = new User();
+        user.setFirstName("Existing");
+
+        // Act
+        userMapper.updateUserFromAdminPatchDto(
+                null,
+                user
+        );
+
+        // Assert
+        assertEquals("Existing", user.getFirstName());
+    }
+
+    @Test
     void shouldUpdateUserFromUserProfileDto() {
         // Arrange
         UserUpdateProfileRequestDto requestDto =
@@ -132,7 +181,10 @@ class UserMapperTest {
         User user = new User();
 
         // Act
-        userMapper.updateUserFromUserDto(requestDto, user);
+        userMapper.updateUserFromUserDto(
+                requestDto,
+                user
+        );
 
         // Assert
         assertEquals("Max", user.getFirstName());
@@ -157,8 +209,11 @@ class UserMapperTest {
     @Test
     void shouldMapUserToUserResponseDto() {
         // Arrange
-        LocalDateTime createdAt = LocalDateTime.now().minusDays(1);
-        LocalDateTime updatedAt = LocalDateTime.now();
+        LocalDateTime createdAt =
+                LocalDateTime.now().minusDays(1);
+
+        LocalDateTime updatedAt =
+                LocalDateTime.now();
 
         Role role = new Role();
         role.setName(RoleType.ADMIN);
@@ -177,18 +232,37 @@ class UserMapperTest {
         user.setUpdatedAt(updatedAt);
 
         // Act
-        UserResponseDto responseDto = userMapper.toUserResponseDto(user);
+        UserResponseDto responseDto =
+                userMapper.toUserResponseDto(user);
 
         // Assert
         assertNull(responseDto.getId());
         assertEquals("John", responseDto.getFirstName());
         assertEquals("Doe", responseDto.getLastName());
-        assertEquals("john.doe@test.com", responseDto.getEmail());
-        assertEquals("12345678", responseDto.getPhoneNumber());
-        assertEquals(UserStatus.ACTIVE, responseDto.getStatus());
-        assertEquals(Set.of(RoleType.ADMIN), responseDto.getRoles());
-        assertEquals(createdAt, responseDto.getCreatedAt());
-        assertEquals(updatedAt, responseDto.getUpdatedAt());
+        assertEquals(
+                "john.doe@test.com",
+                responseDto.getEmail()
+        );
+        assertEquals(
+                "12345678",
+                responseDto.getPhoneNumber()
+        );
+        assertEquals(
+                UserStatus.ACTIVE,
+                responseDto.getStatus()
+        );
+        assertEquals(
+                Set.of(RoleType.ADMIN),
+                responseDto.getRoles()
+        );
+        assertEquals(
+                createdAt,
+                responseDto.getCreatedAt()
+        );
+        assertEquals(
+                updatedAt,
+                responseDto.getUpdatedAt()
+        );
     }
 
     @Test
