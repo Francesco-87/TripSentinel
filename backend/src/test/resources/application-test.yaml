@@ -1,0 +1,16 @@
+spring:
+    datasource:
+        url: jdbc:mariadb://localhost:3306/trip_sentinel_test
+        username: trip_sentinel_user
+        password: trip_sentinel_pass
+        driver-class-name: org.mariadb.jdbc.Driver
+
+    jpa:
+        open-in-view: false
+        hibernate:
+            ddl-auto: validate
+
+    flyway:
+        enabled: true
+        locations: classpath:db/migration
+        baseline-on-migrate: true
