@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.cicconesoftware.tripsentinel.dto.checkinmethod.CheckInMethodResponseDto;
 import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
 import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
+import com.cicconesoftware.tripsentinel.exception.ResourceNotFoundException;
 import com.cicconesoftware.tripsentinel.mapper.checkinmethod.CheckInMethodMapper;
 import com.cicconesoftware.tripsentinel.repository.CheckInMethodRepository;
 
@@ -25,7 +26,7 @@ public class CheckInMethodServiceImpl implements CheckInMethodService {
     public CheckInMethodResponseDto getById(Long id){
 
         CheckInMethod checkInMethod = checkInMethodRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Check-in method not found with id: " + id));
 
             return checkInMethodMapper.toCheckInMethodResponseDto(checkInMethod);
     }
@@ -33,7 +34,7 @@ public class CheckInMethodServiceImpl implements CheckInMethodService {
     @Override
     public CheckInMethodResponseDto getByName(CheckInMethodType name){
         CheckInMethod method = checkInMethodRepository.findByName(name)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Check-in method not found with name: " + name));
 
             return checkInMethodMapper.toCheckInMethodResponseDto(method);
     }

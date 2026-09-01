@@ -71,4 +71,24 @@ class RoleIntegrationTest {
                 .andExpect(jsonPath("$.id").value(responderRole.getId()))
                 .andExpect(jsonPath("$.name").value("RESPONDER"));
     }
+
+    @Test
+void shouldReturnNotFoundWhenRoleDoesNotExistById() throws Exception {
+
+    mockMvc.perform(get("/api/roles/{id}", 999999L))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.message")
+                    .value("Role not found with id: 999999"))
+            .andExpect(jsonPath("$.timestamp").exists());
+}
+
+
+@Test
+void shouldReturnNotFoundWhenRoleDoesNotExistByName() throws Exception {
+
+    mockMvc.perform(get("/api/roles/by-name/{name}", "UNKNOWN"))
+            .andExpect(status().isBadRequest());
+}
 }

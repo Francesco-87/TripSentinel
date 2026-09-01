@@ -137,7 +137,18 @@ class SessionEventIntegrationTest {
         );
     }
 
+    @Test
+        void shouldReturnNotFoundWhenSessionEventDoesNotExist() throws Exception {
 
+        mockMvc.perform(get("/api/session-events/{id}", 999999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message")
+                        .value("Session event not found with id: 999999"))
+                .andExpect(jsonPath("$.timestamp").exists());
+        }
+        
     private Long createEvent(
             Long sessionId,
             SessionEventType type,

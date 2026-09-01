@@ -9,6 +9,7 @@ import com.cicconesoftware.tripsentinel.mapper.role.RoleMapper;
 import com.cicconesoftware.tripsentinel.repository.RoleRepository;
 import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
+import com.cicconesoftware.tripsentinel.exception.ResourceNotFoundException;
 
 
 @Service
@@ -28,7 +29,7 @@ public class RoleServiceImpl implements RoleService{
     public RoleResponseDto getById(Long id){
 
         Role role = roleRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found with id: " + id));
 
 
         return roleMapper.toRoleResponseDto(role);
@@ -38,7 +39,7 @@ public class RoleServiceImpl implements RoleService{
     public RoleResponseDto getByName(RoleType name){
 
         Role role = roleRepository.findByName(name)
-              .orElseThrow();
+              .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + name));
 
 
         return roleMapper.toRoleResponseDto(role);

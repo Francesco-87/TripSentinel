@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.cicconesoftware.tripsentinel.dto.session.SessionEventResponseDto;
 import com.cicconesoftware.tripsentinel.entity.SessionEvent;
+import com.cicconesoftware.tripsentinel.exception.ResourceNotFoundException;
 import com.cicconesoftware.tripsentinel.mapper.session.SessionEventMapper;
 import com.cicconesoftware.tripsentinel.repository.SessionEventRepository;
 
@@ -25,7 +26,7 @@ public class SessionEventServiceImpl implements SessionEventService {
     public SessionEventResponseDto getById(Long id) {
         
         SessionEvent sessionEvent = repository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Session event not found with id: " + id));
 
         return mapper.toSessionEventResponseDto(sessionEvent); 
     }

@@ -10,6 +10,7 @@ import com.cicconesoftware.tripsentinel.dto.responder.UpdateResponderAvailabilit
 import com.cicconesoftware.tripsentinel.entity.ResponderAvailability;
 import com.cicconesoftware.tripsentinel.entity.User;
 import com.cicconesoftware.tripsentinel.entity.enums.AvailabilityStatus;
+import com.cicconesoftware.tripsentinel.exception.ResourceNotFoundException;
 import com.cicconesoftware.tripsentinel.mapper.responder.ResponderAvailabilityMapper;
 import com.cicconesoftware.tripsentinel.repository.ResponderAvailabilityRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
@@ -33,7 +34,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
     public ResponderAvailabilityResponseDto getById(Long id){
 
         ResponderAvailability availability = repository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Responder availability not found with id: " + id));
 
         return mapper.toResponderAvailabilityResponseDto(availability);
     }
@@ -65,7 +66,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
     ) {
 
         User responder = userRepository.findById(responderId)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Responder not found with id: " + responderId));
 
         ResponderAvailability availability =
             mapper.toResponderAvailability(dto);
@@ -85,7 +86,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
     ){
 
         ResponderAvailability availability = repository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Responder availability not found with id: " + id));
 
        mapper.updateResponderAvailability(dto, availability);
 
@@ -98,7 +99,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
     public void delete(Long id){
 
         ResponderAvailability availability = repository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Responder availability not found with id: " + id));
 
         repository.delete(availability);
     }

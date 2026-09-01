@@ -300,6 +300,75 @@ class UserIntegrationTest {
     }
 
 
+    @Test
+    void shouldReturnBadRequestForInvalidCreateUserRequest() throws Exception {
+
+        CreateUserRequestDto dto = new CreateUserRequestDto();
+        dto.setFirstName("");
+        dto.setLastName("Invalid");
+        dto.setEmail("not-an-email");
+        dto.setPhoneNumber("12345678");
+        dto.setPassword("integrationPassword123");
+
+        mockMvc.perform(post("/api/users/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+
+    @Test
+    void shouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
+
+        mockMvc.perform(get("/api/users/{id}", 999999L))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message")
+                        .value("User not found with id: 999999"))
+                .andExpect(jsonPath("$.timestamp").exists());
+    }
+
+
+    @Test
+    void shouldReturnConflictWhenEmailAlreadyExists() throws Exception {
+
+        createCustomer(
+                "duplicate@test.com",
+                "Existing",
+                "User"
+        );
+
+        CreateUserRequestDto dto = new CreateUserRequestDto();
+        dto.setFirstName("Duplicate");
+        dto.setLastName("User");
+        dto.setEmail("duplicate@test.com");
+        dto.setPhoneNumber("12345678");
+        dto.setPassword("integrationPassword123");
+
+        mockMvc.perform(post("/api/users/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.error").value("Conflict"))
+                .andExpect(jsonPath("$.message")
+                        .value("User already exists with email: duplicate@test.com"))
+                .andExpect(jsonPath("$.timestamp").exists());
+
+        assertEquals(
+                1,
+                userRepository.findAll().stream()
+                        .filter(user -> "duplicate@test.com".equals(user.getEmail()))
+                        .count()
+        );
+    }
+
+
     private Long createCustomer(
             String email,
             String firstName,

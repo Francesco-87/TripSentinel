@@ -269,7 +269,114 @@ class CheckInSessionIntegrationTest {
         assertEquals(SessionStatus.CANCELLED, savedSession.getStatus());
     }
 
+    @Test
+void shouldReturnNotFoundWhenSessionDoesNotExist() throws Exception {
 
+    mockMvc.perform(get("/api/check-in-sessions/{id}", 999999L))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.message")
+                    .value("Check-in session not found with id: 999999"))
+            .andExpect(jsonPath("$.timestamp").exists());
+}
+
+
+@Test
+void shouldReturnNotFoundWhenCustomerDoesNotExist() throws Exception {
+
+    Long responderId =
+            createResponder("session.missing.customer.responder@test.com");
+
+    CreateCheckInSessionRequestDto dto =
+            new CreateCheckInSessionRequestDto();
+
+    dto.setResponderId(responderId);
+    dto.setCheckInMethodIds(Set.of(getPhoneMethodId()));
+    dto.setStartAt(LocalDateTime.of(2026, 9, 21, 8, 0));
+    dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 21, 12, 0));
+    dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 21, 13, 0));
+    dto.setLocationDescription("Test location");
+    dto.setImportantNotes("Test notes");
+
+    mockMvc.perform(post(
+            "/api/check-in-sessions/create-user/{userId}",
+            999999L)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.message")
+                    .value("Customer not found with id: 999999"))
+            .andExpect(jsonPath("$.timestamp").exists());
+}
+
+
+@Test
+void shouldReturnBadRequestForInvalidCheckInMethod() throws Exception {
+
+    Long customerId =
+            createCustomer("session.invalid.method.customer@test.com");
+
+    Long responderId =
+            createResponder("session.invalid.method.responder@test.com");
+
+    CreateCheckInSessionRequestDto dto =
+            new CreateCheckInSessionRequestDto();
+
+    dto.setResponderId(responderId);
+    dto.setCheckInMethodIds(Set.of(999999L));
+    dto.setStartAt(LocalDateTime.of(2026, 9, 22, 8, 0));
+    dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 22, 12, 0));
+    dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 22, 13, 0));
+    dto.setLocationDescription("Test location");
+    dto.setImportantNotes("Test notes");
+
+    mockMvc.perform(post(
+            "/api/check-in-sessions/create-user/{userId}",
+            customerId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message")
+                    .value("Invalid check-in method"))
+            .andExpect(jsonPath("$.timestamp").exists());
+}
+
+
+@Test
+void shouldReturnBadRequestForInvalidSessionRequest() throws Exception {
+
+    Long customerId =
+            createCustomer("session.invalid.dto.customer@test.com");
+
+    Long responderId =
+            createResponder("session.invalid.dto.responder@test.com");
+
+    CreateCheckInSessionRequestDto dto =
+            new CreateCheckInSessionRequestDto();
+
+    dto.setResponderId(responderId);
+    dto.setCheckInMethodIds(Set.of(getPhoneMethodId()));
+
+    // Required date/time fields intentionally missing
+    dto.setLocationDescription("Test location");
+    dto.setImportantNotes("Test notes");
+
+    mockMvc.perform(post(
+            "/api/check-in-sessions/create-user/{userId}",
+            customerId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.timestamp").exists());
+}
     private Long createCustomer(String email) throws Exception {
 
         CreateUserRequestDto dto = new CreateUserRequestDto();

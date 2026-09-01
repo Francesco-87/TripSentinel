@@ -13,6 +13,8 @@ import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
 import com.cicconesoftware.tripsentinel.entity.CheckInSession;
 import com.cicconesoftware.tripsentinel.entity.User;
 import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
+import com.cicconesoftware.tripsentinel.exception.BadRequestException;
+import com.cicconesoftware.tripsentinel.exception.ResourceNotFoundException;
 import com.cicconesoftware.tripsentinel.mapper.session.CheckInSessionMapper;
 import com.cicconesoftware.tripsentinel.repository.CheckInMethodRepository;
 import com.cicconesoftware.tripsentinel.repository.CheckInSessionRepository;
@@ -37,7 +39,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
     @Override
     public CheckInSessionResponseDto getById(Long id) {
         CheckInSession session = repository.findById(id)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Check-in session not found with id: " + id));
         
         return mapper.toCheckInSessionResponseDto(session);
     }
@@ -70,15 +72,15 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
     @Override
     public CheckInSessionResponseDto adminCreateCheckInSession(AdminCreateCheckInSessionRequestDto dto) {
        User customer = userRepository.findById(dto.getCustomerId())
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + dto.getCustomerId()));
 
         User responder = userRepository.findById(dto.getResponderId())
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Responder not found with id: " + dto.getResponderId()));
 
         List<CheckInMethod> checkInMethods =
         checkInMethodRepository.findAllById(dto.getCheckInMethodIds());
         if (checkInMethods.size() != dto.getCheckInMethodIds().size()) {
-        throw new IllegalArgumentException("Invalid check-in method");
+        throw new BadRequestException("Invalid check-in method");
         }
 
 
@@ -97,15 +99,15 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
     @Override
     public CheckInSessionResponseDto createCheckInSessionForUser(CreateCheckInSessionRequestDto dto, Long userId) {
         User customer = userRepository.findById(userId)
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: " + userId));
 
         User responder = userRepository.findById(dto.getResponderId())
-            .orElseThrow();
+            .orElseThrow(() -> new ResourceNotFoundException("Responder not found with id: " + dto.getResponderId()));
 
         List<CheckInMethod> checkInMethods =
         checkInMethodRepository.findAllById(dto.getCheckInMethodIds());
         if (checkInMethods.size() != dto.getCheckInMethodIds().size()) {
-        throw new IllegalArgumentException("Invalid check-in method");
+        throw new BadRequestException("Invalid check-in method");
         }
 
 
@@ -124,7 +126,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
     @Override
     public CheckInSessionResponseDto updateCheckInSession(UpdateCheckInSessionRequestDto dto, Long sessionId) {
         CheckInSession session = repository.findById(sessionId)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Check-in session not found with id: " + sessionId));
         mapper.updateCheckInSession(dto, session);
         session = repository.save(session);
         return mapper.toCheckInSessionResponseDto(session);
@@ -133,7 +135,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
     @Override
     public CheckInSessionResponseDto cancelCheckInSession(Long sessionId) {
         CheckInSession session = repository.findById(sessionId)
-                .orElseThrow();
+                .orElseThrow(() -> new ResourceNotFoundException("Check-in session not found with id: " + sessionId));
         session.setStatus(SessionStatus.CANCELLED);
         session = repository.save(session);
         return mapper.toCheckInSessionResponseDto(session);

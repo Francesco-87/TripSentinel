@@ -16,6 +16,8 @@ import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
+import com.cicconesoftware.tripsentinel.exception.ConflictException;
+import com.cicconesoftware.tripsentinel.exception.ResourceNotFoundException;
 import com.cicconesoftware.tripsentinel.mapper.user.UserMapper;
 import com.cicconesoftware.tripsentinel.repository.RoleRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
@@ -35,13 +37,13 @@ public class UserServiceImpl implements UserService {
 
      @Override
     public UserResponseDto getById(Long id) {
-            User user = userRepository.findById(id).orElseThrow();
+            User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
             return userMapper.toUserResponseDto(user);                   
      }
 
     @Override
     public UserResponseDto getByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
         return userMapper.toUserResponseDto(user);
     }
 
@@ -57,9 +59,14 @@ public class UserServiceImpl implements UserService {
 public UserResponseDto create(CreateUserRequestDto dto) {
 
     User user = userMapper.toUserEntity(dto);
+    if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+    throw new ConflictException("User already exists with email: " + dto.getEmail());
+    }
 
     Role customerRole = roleRepository.findByName(RoleType.CUSTOMER)
-        .orElseThrow();
+        .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + RoleType.CUSTOMER));
+
+   
 
     user.setRoles(Set.of(customerRole));
     user.setStatus(UserStatus.ACTIVE);
@@ -74,9 +81,13 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
 
     User user = userMapper.toUserEntity(dto);
 
+    if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+    throw new ConflictException("User already exists with email: " + dto.getEmail());
+}
+
     Set<Role> roles = dto.getRoles().stream()
         .map(roleType -> roleRepository.findByName(roleType)
-            .orElseThrow())
+            .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + roleType)))
         .collect(Collectors.toSet());
 
     user.setRoles(roles);
@@ -88,14 +99,21 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
 
    @Override
     public UserResponseDto adminPatch(Long id, AdminPatchUserRequestDto dto) {
-        User existingUser = userRepository.findById(id).orElseThrow();
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+
+        if (dto.getEmail() != null &&
+        userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
+        throw new ConflictException(
+            "User already exists with email: " + dto.getEmail()
+        );
+        }
 
         userMapper.updateUserFromAdminPatchDto(dto, existingUser);
 
         if (dto.getRoles() != null) {
             Set<Role> roles = dto.getRoles().stream()
                     .map(roleType -> roleRepository.findByName(roleType)
-                            .orElseThrow())
+                            .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + roleType)))
                     .collect(Collectors.toSet());
 
             existingUser.setRoles(roles);
@@ -108,11 +126,17 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
 
     @Override
     public UserResponseDto adminUpdate(Long id, AdminUpdateUserRequestDto dto) {
-        User existingUser = userRepository.findById(id).orElseThrow();
+        
+        
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+         if (userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
+        throw new ConflictException("User already exists with email: " + dto.getEmail());
+        }
         userMapper.updateUserFromAdminDto(dto, existingUser);
+       
        Set<Role> roles = dto.getRoles().stream()
         .map(roleType -> roleRepository.findByName(roleType)
-                .orElseThrow())
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + roleType)))
         .collect(Collectors.toSet());
 
 existingUser.setRoles(roles);
@@ -122,13 +146,17 @@ existingUser.setRoles(roles);
 
     @Override
     public UserResponseDto userUpdate(Long id, UserUpdateProfileRequestDto dto) {
-        User existingUser = userRepository.findById(id).orElseThrow();
+
+        
+
+        User existingUser = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        if (userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
+        throw new ConflictException("User already exists with email: " + dto.getEmail());
+        }
         userMapper.updateUserFromUserDto(dto, existingUser);
+        
         User savedUser = userRepository.save(existingUser);
         return userMapper.toUserResponseDto(savedUser);
     }
-
-
- 
 
 }

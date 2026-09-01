@@ -233,6 +233,68 @@ class ResponderAvailabilityIntegrationTest {
         );
     }
 
+    @Test
+void shouldReturnNotFoundWhenAvailabilityDoesNotExist() throws Exception {
+
+    mockMvc.perform(get(
+            "/api/responder-availability/{id}",
+            999999L))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.message")
+                    .value("Responder availability not found with id: 999999"))
+            .andExpect(jsonPath("$.timestamp").exists());
+}
+
+
+@Test
+void shouldReturnNotFoundWhenCreatingAvailabilityForNonexistentResponder()
+        throws Exception {
+
+    CreateResponderAvailabilityRequestDto dto =
+            new CreateResponderAvailabilityRequestDto();
+
+    dto.setAvailableFrom(LocalDateTime.of(2026, 9, 7, 8, 0));
+    dto.setAvailableUntil(LocalDateTime.of(2026, 9, 7, 16, 0));
+
+    mockMvc.perform(post(
+            "/api/responder-availability/responder/{responderId}",
+            999999L)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.status").value(404))
+            .andExpect(jsonPath("$.error").value("Not Found"))
+            .andExpect(jsonPath("$.message")
+                    .value("Responder not found with id: 999999"))
+            .andExpect(jsonPath("$.timestamp").exists());
+}
+
+
+@Test
+void shouldReturnBadRequestForInvalidAvailabilityRequest() throws Exception {
+
+    Long responderId =
+            createResponder("availability.invalid@test.com");
+
+    CreateResponderAvailabilityRequestDto dto =
+            new CreateResponderAvailabilityRequestDto();
+
+    // availableFrom intentionally missing
+    dto.setAvailableUntil(LocalDateTime.of(2026, 9, 7, 16, 0));
+
+    mockMvc.perform(post(
+            "/api/responder-availability/responder/{responderId}",
+            responderId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(dto)))
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.status").value(400))
+            .andExpect(jsonPath("$.error").value("Bad Request"))
+            .andExpect(jsonPath("$.message").exists())
+            .andExpect(jsonPath("$.timestamp").exists());
+}
 
     private Long createResponder(String email) throws Exception {
 
