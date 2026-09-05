@@ -1,6 +1,6 @@
 package com.cicconesoftware.tripsentinel.dto.user;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
@@ -16,10 +16,11 @@ public class UserResponseDto {
     private final String phoneNumber;
     private final UserStatus status;
     private final Set<RoleType> roles;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    private final Instant createdAt;
+    private final Instant updatedAt;
 
-    public UserResponseDto(Long id, String firstName, String lastName, String email, String phoneNumber, UserStatus status, Set<RoleType> roles, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public UserResponseDto(Long id, String firstName, String lastName, String email, String phoneNumber,
+            UserStatus status, Set<RoleType> roles, Instant createdAt, Instant updatedAt) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -59,11 +60,11 @@ public class UserResponseDto {
         return roles;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
     

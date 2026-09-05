@@ -3,7 +3,7 @@ package com.cicconesoftware.tripsentinel.mapper.user;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -222,11 +222,11 @@ class UserMapperTest {
     @Test
     void shouldMapUserToUserResponseDto() {
         // Arrange
-        LocalDateTime createdAt =
-                LocalDateTime.now().minusDays(1);
+        Instant createdAt =
+                Instant.now().minusSeconds(24 * 60 * 60);
 
-        LocalDateTime updatedAt =
-                LocalDateTime.now();
+        Instant updatedAt =
+                Instant.now();
 
         Role role = new Role();
         role.setName(RoleType.ADMIN);

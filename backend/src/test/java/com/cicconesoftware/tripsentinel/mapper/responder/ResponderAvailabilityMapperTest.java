@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 
@@ -35,8 +36,8 @@ void shouldMapCreateRequestDtoToResponderAvailabilityEntity() {
             responderAvailabilityMapper.toResponderAvailability(requestDto);
 
     // Assert
-    assertEquals(availableFrom, responderAvailability.getAvailableFrom());
-    assertEquals(availableUntil, responderAvailability.getAvailableUntil());
+    assertNull(responderAvailability.getAvailableFrom());
+    assertNull(responderAvailability.getAvailableUntil());
 }
 
     @Test
@@ -53,6 +54,10 @@ void shouldMapCreateRequestDtoToResponderAvailabilityEntity() {
 
         ResponderAvailability responderAvailability =
                 new ResponderAvailability();
+        Instant originalFrom = Instant.parse("2026-09-01T06:00:00Z");
+        Instant originalUntil = Instant.parse("2026-09-01T14:00:00Z");
+        responderAvailability.setAvailableFrom(originalFrom);
+        responderAvailability.setAvailableUntil(originalUntil);
 
         // Act
         responderAvailabilityMapper.updateResponderAvailability(
@@ -61,8 +66,8 @@ void shouldMapCreateRequestDtoToResponderAvailabilityEntity() {
         );
 
         // Assert
-        assertEquals(availableFrom, responderAvailability.getAvailableFrom());
-        assertEquals(availableUntil, responderAvailability.getAvailableUntil());
+        assertEquals(originalFrom, responderAvailability.getAvailableFrom());
+        assertEquals(originalUntil, responderAvailability.getAvailableUntil());
         assertEquals(
                 AvailabilityStatus.UNAVAILABLE,
                 responderAvailability.getStatus()
@@ -72,10 +77,10 @@ void shouldMapCreateRequestDtoToResponderAvailabilityEntity() {
     @Test
     void shouldMapResponderAvailabilityToResponseDto() {
        // Arrange
-        LocalDateTime availableFrom = LocalDateTime.now();
-        LocalDateTime availableUntil = availableFrom.plusHours(6);
-        LocalDateTime createdAt = availableFrom.minusDays(1);
-        LocalDateTime updatedAt = availableFrom;
+        Instant availableFrom = Instant.parse("2026-09-01T06:00:00Z");
+        Instant availableUntil = availableFrom.plusSeconds(6 * 60 * 60);
+        Instant createdAt = availableFrom.minusSeconds(24 * 60 * 60);
+        Instant updatedAt = availableFrom;
 
         User responder = new User();
 
@@ -83,6 +88,7 @@ void shouldMapCreateRequestDtoToResponderAvailabilityEntity() {
         responderAvailability.setResponder(responder);
         responderAvailability.setAvailableFrom(availableFrom);
         responderAvailability.setAvailableUntil(availableUntil);
+        responderAvailability.setTimeZone("Europe/Oslo");
         responderAvailability.setStatus(AvailabilityStatus.AVAILABLE);
         responderAvailability.setCreatedAt(createdAt);
         responderAvailability.setUpdatedAt(updatedAt);
@@ -96,6 +102,7 @@ void shouldMapCreateRequestDtoToResponderAvailabilityEntity() {
         assertNull(responseDto.getResponderId());
         assertEquals(availableFrom, responseDto.getAvailableFrom());
         assertEquals(availableUntil, responseDto.getAvailableUntil());
+        assertEquals("Europe/Oslo", responseDto.getTimeZone());
         assertEquals(AvailabilityStatus.AVAILABLE, responseDto.getStatus());
         assertEquals(createdAt, responseDto.getCreatedAt());
         assertEquals(updatedAt, responseDto.getUpdatedAt());

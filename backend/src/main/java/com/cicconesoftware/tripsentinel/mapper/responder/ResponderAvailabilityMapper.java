@@ -11,20 +11,18 @@ import com.cicconesoftware.tripsentinel.entity.ResponderAvailability;
 /** Maps between responder availability entities and DTOs. */
 public class ResponderAvailabilityMapper {
 
-    /** Maps the requested time range; owner and initial status are assigned by the service. */
+    /** Creates an availability shell; owner, status, timezone, and instants are assigned by the service. */
     public ResponderAvailability toResponderAvailability(CreateResponderAvailabilityRequestDto dto) {
         if (dto == null) {
             return null;
         }
         ResponderAvailability entity = new ResponderAvailability();
        
-        entity.setAvailableFrom(dto.getAvailableFrom());
-        entity.setAvailableUntil(dto.getAvailableUntil());
         return entity;
     }
 
 
-    /** Replaces the time range and status while preserving the owning responder. */
+    /** Replaces status while the service handles the timezone-aware time range. */
     public void updateResponderAvailability(
         UpdateResponderAvailabilityRequestDto dto,
         ResponderAvailability entity) {
@@ -33,8 +31,6 @@ public class ResponderAvailabilityMapper {
                 return;
             }
 
-            entity.setAvailableFrom(dto.getAvailableFrom());
-            entity.setAvailableUntil(dto.getAvailableUntil());
             entity.setStatus(dto.getStatus());
     
         }
@@ -51,6 +47,7 @@ public class ResponderAvailabilityMapper {
                 responderAvailability.getResponder().getId(),
                 responderAvailability.getAvailableFrom(),
                 responderAvailability.getAvailableUntil(),
+                responderAvailability.getTimeZone(),
                 responderAvailability.getStatus(),
                 responderAvailability.getCreatedAt(),   
                 responderAvailability.getUpdatedAt()

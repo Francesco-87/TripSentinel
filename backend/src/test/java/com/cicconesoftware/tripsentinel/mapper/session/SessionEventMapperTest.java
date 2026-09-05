@@ -3,7 +3,7 @@ package com.cicconesoftware.tripsentinel.mapper.session;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,7 @@ class SessionEventMapperTest {
     @Test
     void shouldMapSessionEventToSessionEventResponseDto() {
         // Arrange
-        LocalDateTime createdAt = LocalDateTime.now();
+        Instant createdAt = Instant.now();
 
         SessionEvent sessionEvent = new SessionEvent();
         sessionEvent.setEventType(SessionEventType.CREATED);

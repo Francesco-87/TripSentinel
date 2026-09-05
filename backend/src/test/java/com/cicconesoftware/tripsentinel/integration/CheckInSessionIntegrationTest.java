@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Import;
 
 import com.cicconesoftware.tripsentinel.dto.session.AdminCreateCheckInSessionRequestDto;
+import com.cicconesoftware.tripsentinel.config.TestTimeConfiguration;
 import com.cicconesoftware.tripsentinel.dto.session.CreateCheckInSessionRequestDto;
 import com.cicconesoftware.tripsentinel.dto.session.UpdateCheckInSessionRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
@@ -42,6 +45,7 @@ import tools.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @Transactional
+@Import(TestTimeConfiguration.class)
 class CheckInSessionIntegrationTest {
 
     @Autowired
@@ -73,6 +77,7 @@ class CheckInSessionIntegrationTest {
         dto.setStartAt(LocalDateTime.of(2026, 9, 10, 8, 0));
         dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 10, 12, 0));
         dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 10, 13, 0));
+        dto.setTimeZone("Europe/Oslo");
         dto.setLocationDescription("Nordmarka south");
         dto.setImportantNotes("Integration test");
 
@@ -83,6 +88,8 @@ class CheckInSessionIntegrationTest {
                 .andExpect(jsonPath("$.customerId").value(customerId))
                 .andExpect(jsonPath("$.responderId").value(responderId))
                 .andExpect(jsonPath("$.status").value("PLANNED"))
+                .andExpect(jsonPath("$.startAt").value("2026-09-10T06:00:00Z"))
+                .andExpect(jsonPath("$.timeZone").value("Europe/Oslo"))
                 .andExpect(jsonPath("$.locationDescription").value("Nordmarka south"))
                 .andExpect(jsonPath("$.importantNotes").value("Integration test"));
 
@@ -111,6 +118,7 @@ class CheckInSessionIntegrationTest {
         dto.setStartAt(LocalDateTime.of(2026, 9, 11, 8, 0));
         dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 11, 12, 0));
         dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 11, 13, 0));
+        dto.setTimeZone("UTC");
         dto.setLocationDescription("Admin-created session");
         dto.setImportantNotes("Admin notes");
 
@@ -215,6 +223,7 @@ class CheckInSessionIntegrationTest {
         dto.setStartAt(LocalDateTime.of(2026, 9, 20, 10, 0));
         dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 20, 15, 0));
         dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 20, 16, 0));
+        dto.setTimeZone("UTC");
         dto.setLocationDescription("Updated location");
         dto.setImportantNotes("Updated notes");
 
@@ -230,17 +239,17 @@ class CheckInSessionIntegrationTest {
                 checkInSessionRepository.findById(sessionId).orElseThrow();
 
         assertEquals(
-                LocalDateTime.of(2026, 9, 20, 10, 0),
+                LocalDateTime.of(2026, 9, 20, 10, 0).toInstant(ZoneOffset.UTC),
                 savedSession.getStartAt()
         );
 
         assertEquals(
-                LocalDateTime.of(2026, 9, 20, 15, 0),
+                LocalDateTime.of(2026, 9, 20, 15, 0).toInstant(ZoneOffset.UTC),
                 savedSession.getExpectedReturnAt()
         );
 
         assertEquals(
-                LocalDateTime.of(2026, 9, 20, 16, 0),
+                LocalDateTime.of(2026, 9, 20, 16, 0).toInstant(ZoneOffset.UTC),
                 savedSession.getLatestCheckInAt()
         );
 
@@ -296,6 +305,7 @@ void shouldReturnNotFoundWhenCustomerDoesNotExist() throws Exception {
     dto.setStartAt(LocalDateTime.of(2026, 9, 21, 8, 0));
     dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 21, 12, 0));
     dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 21, 13, 0));
+    dto.setTimeZone("UTC");
     dto.setLocationDescription("Test location");
     dto.setImportantNotes("Test notes");
 
@@ -330,6 +340,7 @@ void shouldReturnBadRequestForInvalidCheckInMethod() throws Exception {
     dto.setStartAt(LocalDateTime.of(2026, 9, 22, 8, 0));
     dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 22, 12, 0));
     dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 22, 13, 0));
+    dto.setTimeZone("UTC");
     dto.setLocationDescription("Test location");
     dto.setImportantNotes("Test notes");
 
@@ -436,6 +447,7 @@ void shouldReturnBadRequestForInvalidSessionRequest() throws Exception {
         dto.setStartAt(LocalDateTime.of(2026, 9, 15, 8, 0));
         dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 15, 12, 0));
         dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 15, 13, 0));
+        dto.setTimeZone("UTC");
         dto.setLocationDescription("Integration location");
         dto.setImportantNotes("Integration notes");
 

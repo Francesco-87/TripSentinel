@@ -1,6 +1,6 @@
 package com.cicconesoftware.tripsentinel.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,13 +30,16 @@ public class CheckInSession {
     private Long id;
 
     @Column(name = "start_at", nullable = false)
-    private LocalDateTime startAt;
+    private Instant startAt;
 
     @Column(name = "expected_return_at", nullable = false)
-    private LocalDateTime expectedReturnAt;
+    private Instant expectedReturnAt;
 
     @Column(name = "latest_check_in_at", nullable = false)
-    private LocalDateTime latestCheckInAt;  
+    private Instant latestCheckInAt;
+
+    @Column(name = "time_zone", nullable = false, length = 63)
+    private String timeZone;
 
     @Column(name = "location_description", nullable = false, columnDefinition = "TEXT")
     private String locationDescription;
@@ -49,10 +52,10 @@ public class CheckInSession {
     private SessionStatus status;
 
     @Column(name  = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     public CheckInSession() {
     }
@@ -114,30 +117,38 @@ public class CheckInSession {
         this.events = events;
     }
 
-    public LocalDateTime getStartAt() {
+    public Instant getStartAt() {
         return startAt;
     }
 
-    public void setStartAt(LocalDateTime startAt) {
+    public void setStartAt(Instant startAt) {
         this.startAt = startAt;
     }
 
 
-    public LocalDateTime getExpectedReturnAt() {
+    public Instant getExpectedReturnAt() {
         return expectedReturnAt;
     }
 
-    public void setExpectedReturnAt(LocalDateTime expectedReturnAt) {
+    public void setExpectedReturnAt(Instant expectedReturnAt) {
         this.expectedReturnAt = expectedReturnAt;
     }
 
     /** Returns the customer-defined deadline after which the session may escalate. */
-    public LocalDateTime getLatestCheckInAt() {
+    public Instant getLatestCheckInAt() {
         return latestCheckInAt;
     }
 
-    public void setLatestCheckInAt(LocalDateTime latestCheckInAt) {
+    public void setLatestCheckInAt(Instant latestCheckInAt) {
         this.latestCheckInAt = latestCheckInAt;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public String getLocationDescription() {
@@ -164,19 +175,19 @@ public class CheckInSession {
         this.status = status;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
+    public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
     }
 

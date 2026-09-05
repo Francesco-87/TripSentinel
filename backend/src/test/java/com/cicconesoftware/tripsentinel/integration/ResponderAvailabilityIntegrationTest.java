@@ -11,6 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,7 @@ class ResponderAvailabilityIntegrationTest {
 
         dto.setAvailableFrom(LocalDateTime.of(2026, 9, 1, 8, 0));
         dto.setAvailableUntil(LocalDateTime.of(2026, 9, 1, 16, 0));
+        dto.setTimeZone("Europe/Oslo");
 
         mockMvc.perform(post(
                 "/api/responder-availability/responder/{responderId}",
@@ -72,7 +74,8 @@ class ResponderAvailabilityIntegrationTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.responderId").value(responderId))
                 .andExpect(jsonPath("$.status").value("AVAILABLE"))
-                .andExpect(jsonPath("$.availableFrom").exists())
+                .andExpect(jsonPath("$.availableFrom").value("2026-09-01T06:00:00Z"))
+                .andExpect(jsonPath("$.timeZone").value("Europe/Oslo"))
                 .andExpect(jsonPath("$.availableUntil").exists());
 
         var records =
@@ -179,6 +182,7 @@ class ResponderAvailabilityIntegrationTest {
         dto.setAvailableFrom(LocalDateTime.of(2026, 9, 5, 10, 0));
         dto.setAvailableUntil(LocalDateTime.of(2026, 9, 5, 18, 0));
         dto.setStatus(AvailabilityStatus.UNAVAILABLE);
+        dto.setTimeZone("UTC");
 
         mockMvc.perform(put(
                 "/api/responder-availability/{id}",
@@ -196,12 +200,12 @@ class ResponderAvailabilityIntegrationTest {
                         .orElseThrow();
 
         assertEquals(
-                LocalDateTime.of(2026, 9, 5, 10, 0),
+                LocalDateTime.of(2026, 9, 5, 10, 0).toInstant(ZoneOffset.UTC),
                 saved.getAvailableFrom()
         );
 
         assertEquals(
-                LocalDateTime.of(2026, 9, 5, 18, 0),
+                LocalDateTime.of(2026, 9, 5, 18, 0).toInstant(ZoneOffset.UTC),
                 saved.getAvailableUntil()
         );
 
@@ -257,6 +261,7 @@ void shouldReturnNotFoundWhenCreatingAvailabilityForNonexistentResponder()
 
     dto.setAvailableFrom(LocalDateTime.of(2026, 9, 7, 8, 0));
     dto.setAvailableUntil(LocalDateTime.of(2026, 9, 7, 16, 0));
+    dto.setTimeZone("UTC");
 
     mockMvc.perform(post(
             "/api/responder-availability/responder/{responderId}",
@@ -283,6 +288,7 @@ void shouldReturnBadRequestForInvalidAvailabilityRequest() throws Exception {
 
     // availableFrom intentionally missing
     dto.setAvailableUntil(LocalDateTime.of(2026, 9, 7, 16, 0));
+    dto.setTimeZone("UTC");
 
     mockMvc.perform(post(
             "/api/responder-availability/responder/{responderId}",
@@ -330,6 +336,7 @@ void shouldReturnBadRequestForInvalidAvailabilityRequest() throws Exception {
 
         dto.setAvailableFrom(availableFrom);
         dto.setAvailableUntil(availableUntil);
+        dto.setTimeZone("UTC");
 
         mockMvc.perform(post(
                 "/api/responder-availability/responder/{responderId}",
@@ -342,8 +349,8 @@ void shouldReturnBadRequestForInvalidAvailabilityRequest() throws Exception {
                 .findByResponderId(responderId)
                 .stream()
                 .filter(a ->
-                        a.getAvailableFrom().equals(availableFrom)
-                        && a.getAvailableUntil().equals(availableUntil))
+                        a.getAvailableFrom().equals(availableFrom.toInstant(ZoneOffset.UTC))
+                        && a.getAvailableUntil().equals(availableUntil.toInstant(ZoneOffset.UTC)))
                 .findFirst()
                 .orElseThrow()
                 .getId();

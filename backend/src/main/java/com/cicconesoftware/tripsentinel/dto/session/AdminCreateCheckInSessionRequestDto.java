@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 /** Carries administrative data for creating a check-in session. */
@@ -26,6 +27,9 @@ public class AdminCreateCheckInSessionRequestDto {
 
     @NotNull
     private LocalDateTime latestCheckInAt;
+
+    @NotBlank
+    private String timeZone;
 
     
     private String locationDescription;
@@ -78,6 +82,14 @@ public class AdminCreateCheckInSessionRequestDto {
 
     public void setLatestCheckInAt(LocalDateTime latestCheckInAt) {
         this.latestCheckInAt = latestCheckInAt;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public String getLocationDescription() {

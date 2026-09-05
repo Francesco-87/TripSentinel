@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 
@@ -128,6 +129,7 @@ class CheckInSessionControllerTest {
         requestDto.setStartAt(LocalDateTime.of(2026, 9, 1, 8, 0));
         requestDto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 1, 16, 0));
         requestDto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 1, 17, 0));
+        requestDto.setTimeZone("Europe/Oslo");
         requestDto.setLocationDescription("Nordmarka south");
         requestDto.setImportantNotes("Test notes");
 
@@ -161,6 +163,7 @@ class CheckInSessionControllerTest {
         requestDto.setStartAt(LocalDateTime.of(2026, 9, 1, 8, 0));
         requestDto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 1, 16, 0));
         requestDto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 1, 17, 0));
+        requestDto.setTimeZone("Europe/Oslo");
         requestDto.setLocationDescription("Nordmarka south");
         requestDto.setImportantNotes("Test notes");
 
@@ -194,6 +197,7 @@ class CheckInSessionControllerTest {
         requestDto.setStartAt(LocalDateTime.of(2026, 9, 1, 9, 0));
         requestDto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 1, 18, 0));
         requestDto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 1, 19, 0));
+        requestDto.setTimeZone("Europe/Oslo");
         requestDto.setLocationDescription("Nordmarka north");
         requestDto.setImportantNotes("Updated notes");
 
@@ -239,14 +243,15 @@ class CheckInSessionControllerTest {
                 2L,
                 Set.of(),
                 Set.of(method),
-                LocalDateTime.of(2026, 9, 1, 8, 0),
-                LocalDateTime.of(2026, 9, 1, 16, 0),
-                LocalDateTime.of(2026, 9, 1, 17, 0),
+                Instant.parse("2026-09-01T06:00:00Z"),
+                Instant.parse("2026-09-01T14:00:00Z"),
+                Instant.parse("2026-09-01T15:00:00Z"),
+                "Europe/Oslo",
                 "Nordmarka south",
                 "Test notes",
                 SessionStatus.PLANNED,
-                LocalDateTime.of(2026, 8, 30, 10, 0),
-                LocalDateTime.of(2026, 8, 30, 10, 0)
+                Instant.parse("2026-08-30T08:00:00Z"),
+                Instant.parse("2026-08-30T08:00:00Z")
         );
     }
 }

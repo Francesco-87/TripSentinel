@@ -2,7 +2,7 @@ package com.cicconesoftware.tripsentinel.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -74,14 +74,15 @@ public class CheckInSessionRepositoryTest {
         CheckInSession session = new CheckInSession();
         session.setCustomer(savedCustomer);
         session.setResponder(savedResponder);
-        session.setStartAt(LocalDateTime.now());
-        session.setExpectedReturnAt(LocalDateTime.now().plusHours(3));
-        session.setLatestCheckInAt(LocalDateTime.now().plusHours(4));
+        session.setStartAt(Instant.now());
+        session.setExpectedReturnAt(Instant.now().plusSeconds(3 * 60 * 60));
+        session.setLatestCheckInAt(Instant.now().plusSeconds(4 * 60 * 60));
+        session.setTimeZone("UTC");
         session.setLocationDescription("Nordmarka");
         session.setImportantNotes("Test notes");
         session.setStatus(SessionStatus.PLANNED);
-        session.setCreatedAt(LocalDateTime.now());
-        session.setUpdatedAt(LocalDateTime.now());
+        session.setCreatedAt(Instant.now());
+        session.setUpdatedAt(Instant.now());
 
         session.getCheckInMethods().add(phoneMethod);
 

@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import com.cicconesoftware.tripsentinel.entity.enums.AvailabilityStatus;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 
 /** Carries data for updating a responder availability slot. */
 public class UpdateResponderAvailabilityRequestDto {
@@ -18,6 +19,9 @@ public class UpdateResponderAvailabilityRequestDto {
 
     @NotNull
     private AvailabilityStatus status;
+
+    @NotBlank
+    private String timeZone;
 
     public LocalDateTime getAvailableFrom() {
         return availableFrom;
@@ -41,6 +45,14 @@ public class UpdateResponderAvailabilityRequestDto {
 
     public void setStatus(AvailabilityStatus status) {
         this.status = status;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     

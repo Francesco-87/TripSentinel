@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -18,8 +19,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Import;
 
 import com.cicconesoftware.tripsentinel.dto.session.CreateCheckInSessionRequestDto;
+import com.cicconesoftware.tripsentinel.config.TestTimeConfiguration;
 import com.cicconesoftware.tripsentinel.dto.user.AdminCreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.dto.user.CreateUserRequestDto;
 import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
@@ -40,6 +43,7 @@ import tools.jackson.databind.ObjectMapper;
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @Transactional
+@Import(TestTimeConfiguration.class)
 class SessionEventIntegrationTest {
 
     @Autowired
@@ -164,7 +168,7 @@ class SessionEventIntegrationTest {
         event.setSession(session);
         event.setEventType(type);
         event.setNote(note);
-        event.setCreatedAt(LocalDateTime.now());
+        event.setCreatedAt(Instant.now());
 
         return sessionEventRepository
                 .save(event)
@@ -188,6 +192,7 @@ class SessionEventIntegrationTest {
         dto.setStartAt(LocalDateTime.of(2026, 9, 20, 8, 0));
         dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 20, 12, 0));
         dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 20, 13, 0));
+        dto.setTimeZone("UTC");
         dto.setLocationDescription("Integration event location");
         dto.setImportantNotes("Integration event test");
 

@@ -14,6 +14,7 @@ import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Instant;
 import java.util.Optional;
 
 @DataJpaTest
@@ -32,11 +33,12 @@ public class ResponderAvailablityRepositoryTest {
         // Arrange
         // Create a new responder availability entity and set its properties
         ResponderAvailability responderAvailability = new ResponderAvailability();
-        responderAvailability.setAvailableFrom(java.time.LocalDateTime.now());
-        responderAvailability.setAvailableUntil(java.time.LocalDateTime.now().plusHours(2));
+        responderAvailability.setAvailableFrom(Instant.now());
+        responderAvailability.setAvailableUntil(Instant.now().plusSeconds(2 * 60 * 60));
+        responderAvailability.setTimeZone("UTC");
         responderAvailability.setStatus(AvailabilityStatus.AVAILABLE);
-        responderAvailability.setCreatedAt(java.time.LocalDateTime.now());
-        responderAvailability.setUpdatedAt(java.time.LocalDateTime.now());
+        responderAvailability.setCreatedAt(Instant.now());
+        responderAvailability.setUpdatedAt(Instant.now());
 
         User responder = new User();
         responder.setFirstName("firstnametestuser");

@@ -6,7 +6,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +29,7 @@ import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
+import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
 import com.cicconesoftware.tripsentinel.exception.BadRequestException;
 import com.cicconesoftware.tripsentinel.mapper.session.CheckInSessionMapper;
 import com.cicconesoftware.tripsentinel.repository.CheckInMethodRepository;
@@ -56,7 +60,8 @@ class CheckInSessionServiceTest {
                 repository,
                 mapper,
                 userRepository,
-                checkInMethodRepository
+                checkInMethodRepository,
+                Clock.fixed(Instant.parse("2026-09-05T00:00:00Z"), ZoneOffset.UTC)
         );
     }
 
@@ -184,11 +189,14 @@ class CheckInSessionServiceTest {
         dto.setStartAt(LocalDateTime.now().plusDays(1));
         dto.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
         dto.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
+        dto.setTimeZone("UTC");
 
         User customer = new User();
         User responder = new User();
         customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
         responder.setRoles(Set.of(role(RoleType.RESPONDER)));
+        customer.setStatus(UserStatus.ACTIVE);
+        responder.setStatus(UserStatus.ACTIVE);
 
         CheckInMethod method = new CheckInMethod();
 
@@ -245,14 +253,17 @@ class CheckInSessionServiceTest {
 
         dto.setResponderId(2L);
         dto.setCheckInMethodIds(Set.of(10L));
-        dto.setStartAt(LocalDateTime.now().plusDays(1));
-        dto.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
-        dto.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
+        dto.setStartAt(LocalDateTime.of(2026, 9, 10, 8, 0));
+        dto.setExpectedReturnAt(LocalDateTime.of(2026, 9, 10, 12, 0));
+        dto.setLatestCheckInAt(LocalDateTime.of(2026, 9, 10, 13, 0));
+        dto.setTimeZone("Europe/Oslo");
 
         User customer = new User();
         User responder = new User();
         customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
         responder.setRoles(Set.of(role(RoleType.RESPONDER)));
+        customer.setStatus(UserStatus.ACTIVE);
+        responder.setStatus(UserStatus.ACTIVE);
 
         CheckInMethod method = new CheckInMethod();
 
@@ -297,6 +308,8 @@ class CheckInSessionServiceTest {
                 SessionStatus.PLANNED,
                 session.getStatus()
         );
+        assertEquals(Instant.parse("2026-09-10T06:00:00Z"), session.getStartAt());
+        assertEquals("Europe/Oslo", session.getTimeZone());
 
         verify(repository).save(session);
     }
@@ -330,11 +343,74 @@ class CheckInSessionServiceTest {
     @Test
     void shouldRejectSessionThatStartsInThePast() {
         CreateCheckInSessionRequestDto dto = validCreateDto();
-        dto.setStartAt(LocalDateTime.now().minusHours(1));
+        dto.setStartAt(LocalDateTime.of(2026, 9, 4, 23, 0));
         User customer = new User();
         User responder = new User();
         customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
         responder.setRoles(Set.of(role(RoleType.RESPONDER)));
+        customer.setStatus(UserStatus.ACTIVE);
+        responder.setStatus(UserStatus.ACTIVE);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(responder));
+
+        assertThrows(BadRequestException.class, () -> service.createCheckInSessionForUser(dto, 1L));
+    }
+
+    @Test
+    void shouldRejectSessionWhenResponderIsInactive() {
+        CreateCheckInSessionRequestDto dto = validCreateDto();
+        User customer = new User();
+        User responder = new User();
+        customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
+        responder.setRoles(Set.of(role(RoleType.RESPONDER)));
+        customer.setStatus(UserStatus.ACTIVE);
+        responder.setStatus(UserStatus.INACTIVE);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(responder));
+
+        assertThrows(BadRequestException.class, () -> service.createCheckInSessionForUser(dto, 1L));
+    }
+
+    @Test
+    void shouldRejectUnknownTimeZone() {
+        CreateCheckInSessionRequestDto dto = validCreateDto();
+        dto.setTimeZone("Unknown/Zone");
+        User customer = activeUser(RoleType.CUSTOMER);
+        User responder = activeUser(RoleType.RESPONDER);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(responder));
+
+        assertThrows(BadRequestException.class, () -> service.createCheckInSessionForUser(dto, 1L));
+    }
+
+    @Test
+    void shouldRejectNonexistentDaylightSavingTime() {
+        CreateCheckInSessionRequestDto dto = validCreateDto();
+        dto.setStartAt(LocalDateTime.of(2026, 3, 29, 2, 30));
+        dto.setExpectedReturnAt(LocalDateTime.of(2026, 3, 29, 4, 0));
+        dto.setLatestCheckInAt(LocalDateTime.of(2026, 3, 29, 5, 0));
+        dto.setTimeZone("Europe/Oslo");
+        User customer = activeUser(RoleType.CUSTOMER);
+        User responder = activeUser(RoleType.RESPONDER);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(responder));
+
+        assertThrows(BadRequestException.class, () -> service.createCheckInSessionForUser(dto, 1L));
+    }
+
+    @Test
+    void shouldRejectAmbiguousDaylightSavingTime() {
+        CreateCheckInSessionRequestDto dto = validCreateDto();
+        dto.setStartAt(LocalDateTime.of(2026, 10, 25, 2, 30));
+        dto.setExpectedReturnAt(LocalDateTime.of(2026, 10, 25, 4, 0));
+        dto.setLatestCheckInAt(LocalDateTime.of(2026, 10, 25, 5, 0));
+        dto.setTimeZone("Europe/Oslo");
+        User customer = activeUser(RoleType.CUSTOMER);
+        User responder = activeUser(RoleType.RESPONDER);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
         when(userRepository.findById(2L)).thenReturn(Optional.of(responder));
@@ -350,9 +426,10 @@ class CheckInSessionServiceTest {
 
         CheckInSession existingSession =
                 new CheckInSession();
-        existingSession.setStartAt(LocalDateTime.now().plusDays(1));
-        existingSession.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
-        existingSession.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
+        existingSession.setStartAt(Instant.now().plusSeconds(24 * 60 * 60));
+        existingSession.setExpectedReturnAt(Instant.now().plusSeconds(28 * 60 * 60));
+        existingSession.setLatestCheckInAt(Instant.now().plusSeconds(29 * 60 * 60));
+        existingSession.setTimeZone("UTC");
 
         CheckInSessionResponseDto responseDto =
                 org.mockito.Mockito.mock(CheckInSessionResponseDto.class);
@@ -389,13 +466,16 @@ class CheckInSessionServiceTest {
         customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
         User responder = new User();
         responder.setRoles(Set.of(role(RoleType.RESPONDER)));
+        customer.setStatus(UserStatus.ACTIVE);
+        responder.setStatus(UserStatus.ACTIVE);
         CheckInMethod method = new CheckInMethod();
 
         CheckInSession session = new CheckInSession();
         session.setCustomer(customer);
-        session.setStartAt(LocalDateTime.now().plusDays(1));
-        session.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
-        session.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
+        session.setStartAt(Instant.now().plusSeconds(24 * 60 * 60));
+        session.setExpectedReturnAt(Instant.now().plusSeconds(28 * 60 * 60));
+        session.setLatestCheckInAt(Instant.now().plusSeconds(29 * 60 * 60));
+        session.setTimeZone("UTC");
 
         CheckInSessionResponseDto responseDto =
                 org.mockito.Mockito.mock(CheckInSessionResponseDto.class);
@@ -452,6 +532,13 @@ class CheckInSessionServiceTest {
         return role;
     }
 
+    private User activeUser(RoleType roleType) {
+        User user = new User();
+        user.setRoles(Set.of(role(roleType)));
+        user.setStatus(UserStatus.ACTIVE);
+        return user;
+    }
+
     private CreateCheckInSessionRequestDto validCreateDto() {
         CreateCheckInSessionRequestDto dto = new CreateCheckInSessionRequestDto();
         dto.setResponderId(2L);
@@ -459,6 +546,7 @@ class CheckInSessionServiceTest {
         dto.setStartAt(LocalDateTime.now().plusDays(1));
         dto.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
         dto.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
+        dto.setTimeZone("UTC");
         return dto;
     }
 }

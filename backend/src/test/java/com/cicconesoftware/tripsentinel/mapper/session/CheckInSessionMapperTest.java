@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 import org.junit.jupiter.api.Test;
@@ -52,9 +53,9 @@ class CheckInSessionMapperTest {
                 checkInSessionMapper.toCheckInSessionEntity(requestDto);
 
         // Assert
-        assertEquals(startAt, session.getStartAt());
-        assertEquals(expectedReturnAt, session.getExpectedReturnAt());
-        assertEquals(latestCheckInAt, session.getLatestCheckInAt());
+        assertNull(session.getStartAt());
+        assertNull(session.getExpectedReturnAt());
+        assertNull(session.getLatestCheckInAt());
         assertEquals("Nordmarka", session.getLocationDescription());
         assertEquals("Take warm clothes.", session.getImportantNotes());
     }
@@ -87,9 +88,9 @@ class CheckInSessionMapperTest {
                 checkInSessionMapper.toCheckInSessionEntity(requestDto);
 
         // Assert
-        assertEquals(startAt, session.getStartAt());
-        assertEquals(expectedReturnAt, session.getExpectedReturnAt());
-        assertEquals(latestCheckInAt, session.getLatestCheckInAt());
+        assertNull(session.getStartAt());
+        assertNull(session.getExpectedReturnAt());
+        assertNull(session.getLatestCheckInAt());
         assertEquals("Nordmarka", session.getLocationDescription());
         assertEquals("Take warm clothes.", session.getImportantNotes());
     }
@@ -119,14 +120,20 @@ class CheckInSessionMapperTest {
 
         CheckInSession session = new CheckInSession();
         session.setStatus(SessionStatus.PLANNED);
+        Instant originalStart = Instant.parse("2026-09-01T06:00:00Z");
+        Instant originalReturn = Instant.parse("2026-09-01T14:00:00Z");
+        Instant originalDeadline = Instant.parse("2026-09-01T15:00:00Z");
+        session.setStartAt(originalStart);
+        session.setExpectedReturnAt(originalReturn);
+        session.setLatestCheckInAt(originalDeadline);
 
         // Act
         checkInSessionMapper.updateCheckInSession(requestDto, session);
 
         // Assert
-        assertEquals(startAt, session.getStartAt());
-        assertEquals(expectedReturnAt, session.getExpectedReturnAt());
-        assertEquals(latestCheckInAt, session.getLatestCheckInAt());
+        assertEquals(originalStart, session.getStartAt());
+        assertEquals(originalReturn, session.getExpectedReturnAt());
+        assertEquals(originalDeadline, session.getLatestCheckInAt());
         assertEquals("Nordmarka", session.getLocationDescription());
         assertEquals("Take warm clothes.", session.getImportantNotes());
 
@@ -148,11 +155,11 @@ class CheckInSessionMapperTest {
     @Test
     void shouldMapCheckInSessionToResponseDto() {
         // Arrange
-        LocalDateTime startAt = LocalDateTime.now();
-        LocalDateTime expectedReturnAt = startAt.plusHours(5);
-        LocalDateTime latestCheckInAt = startAt.plusHours(6);
-        LocalDateTime createdAt = startAt.minusDays(1);
-        LocalDateTime updatedAt = startAt;
+        Instant startAt = Instant.parse("2026-09-01T06:00:00Z");
+        Instant expectedReturnAt = startAt.plusSeconds(5 * 60 * 60);
+        Instant latestCheckInAt = startAt.plusSeconds(6 * 60 * 60);
+        Instant createdAt = startAt.minusSeconds(24 * 60 * 60);
+        Instant updatedAt = startAt;
 
         User customer = new User();
         User responder = new User();
@@ -173,6 +180,7 @@ class CheckInSessionMapperTest {
         session.setStartAt(startAt);
         session.setExpectedReturnAt(expectedReturnAt);
         session.setLatestCheckInAt(latestCheckInAt);
+        session.setTimeZone("Europe/Oslo");
         session.setLocationDescription("Nordmarka");
         session.setImportantNotes("Take warm clothes.");
         session.setStatus(SessionStatus.PLANNED);
@@ -191,6 +199,7 @@ class CheckInSessionMapperTest {
         assertEquals(startAt, responseDto.getStartAt());
         assertEquals(expectedReturnAt, responseDto.getExpectedReturnAt());
         assertEquals(latestCheckInAt, responseDto.getLatestCheckInAt());
+        assertEquals("Europe/Oslo", responseDto.getTimeZone());
         assertEquals("Nordmarka", responseDto.getLocationDescription());
         assertEquals("Take warm clothes.", responseDto.getImportantNotes());
         assertEquals(SessionStatus.PLANNED, responseDto.getStatus());

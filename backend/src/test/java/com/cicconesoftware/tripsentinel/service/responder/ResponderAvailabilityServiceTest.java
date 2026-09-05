@@ -1,12 +1,17 @@
 package com.cicconesoftware.tripsentinel.service.responder;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,8 +22,12 @@ import com.cicconesoftware.tripsentinel.dto.responder.CreateResponderAvailabilit
 import com.cicconesoftware.tripsentinel.dto.responder.ResponderAvailabilityResponseDto;
 import com.cicconesoftware.tripsentinel.dto.responder.UpdateResponderAvailabilityRequestDto;
 import com.cicconesoftware.tripsentinel.entity.ResponderAvailability;
+import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
 import com.cicconesoftware.tripsentinel.entity.enums.AvailabilityStatus;
+import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
+import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
+import com.cicconesoftware.tripsentinel.exception.BadRequestException;
 import com.cicconesoftware.tripsentinel.mapper.responder.ResponderAvailabilityMapper;
 import com.cicconesoftware.tripsentinel.repository.ResponderAvailabilityRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
@@ -51,6 +60,10 @@ class ResponderAvailabilityServiceTest {
     void shouldGetResponderAvailabilityById() {
         // Arrange
         User responder = new User();
+        Role responderRole = new Role();
+        responderRole.setName(RoleType.RESPONDER);
+        responder.setRoles(Set.of(responderRole));
+        responder.setStatus(UserStatus.ACTIVE);
 
         ResponderAvailability availability = new ResponderAvailability();
         availability.setResponder(responder);
@@ -133,8 +146,13 @@ class ResponderAvailabilityServiceTest {
 
         dto.setAvailableFrom(availableFrom);
         dto.setAvailableUntil(availableUntil);
+        dto.setTimeZone("UTC");
 
         User responder = new User();
+        Role responderRole = new Role();
+        responderRole.setName(RoleType.RESPONDER);
+        responder.setRoles(Set.of(responderRole));
+        responder.setStatus(UserStatus.ACTIVE);
 
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(responder));
@@ -149,8 +167,8 @@ class ResponderAvailabilityServiceTest {
                 service.create(1L, dto);
 
         // Assert
-        assertEquals(availableFrom, result.getAvailableFrom());
-        assertEquals(availableUntil, result.getAvailableUntil());
+        assertEquals(availableFrom.toInstant(ZoneOffset.UTC), result.getAvailableFrom());
+        assertEquals(availableUntil.toInstant(ZoneOffset.UTC), result.getAvailableUntil());
         assertEquals(
                 AvailabilityStatus.AVAILABLE,
                 result.getStatus()
@@ -160,6 +178,19 @@ class ResponderAvailabilityServiceTest {
         verify(repository).save(
                 org.mockito.ArgumentMatchers.any(
                         ResponderAvailability.class));
+    }
+
+    @Test
+    void shouldRejectAvailabilityForInactiveResponder() {
+        CreateResponderAvailabilityRequestDto dto =
+                new CreateResponderAvailabilityRequestDto();
+        User responder = new User();
+        responder.setStatus(UserStatus.INACTIVE);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(responder));
+
+        assertThrows(BadRequestException.class, () -> service.create(1L, dto));
+        verify(repository, never()).save(any(ResponderAvailability.class));
     }
 
     @Test
@@ -174,6 +205,7 @@ class ResponderAvailabilityServiceTest {
         dto.setAvailableFrom(availableFrom);
         dto.setAvailableUntil(availableUntil);
         dto.setStatus(AvailabilityStatus.UNAVAILABLE);
+        dto.setTimeZone("UTC");
 
         User responder = new User();
 
@@ -194,8 +226,8 @@ class ResponderAvailabilityServiceTest {
                 service.update(1L, dto);
 
         // Assert
-        assertEquals(availableFrom, result.getAvailableFrom());
-        assertEquals(availableUntil, result.getAvailableUntil());
+        assertEquals(availableFrom.toInstant(ZoneOffset.UTC), result.getAvailableFrom());
+        assertEquals(availableUntil.toInstant(ZoneOffset.UTC), result.getAvailableUntil());
         assertEquals(
                 AvailabilityStatus.UNAVAILABLE,
                 result.getStatus()

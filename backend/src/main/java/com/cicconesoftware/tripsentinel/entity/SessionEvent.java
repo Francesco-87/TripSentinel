@@ -1,6 +1,6 @@
 package com.cicconesoftware.tripsentinel.entity;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 import com.cicconesoftware.tripsentinel.entity.enums.SessionEventType;
 
@@ -32,7 +32,7 @@ public class SessionEvent {
     private String note;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     public SessionEvent() {
     }
@@ -70,11 +70,11 @@ public class SessionEvent {
         this.note = note;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 

@@ -8,7 +8,7 @@ The long-term goal is to provide a lightweight, privacy-focused alternative to t
 
 ## Current Status
 
-🚧 Backend foundation under active development.
+Backend foundation under active development.
 
 The Spring Boot backend currently includes:
 
@@ -19,6 +19,14 @@ The Spring Boot backend currently includes:
 * REST controllers, services, repositories, DTOs, and validation
 * MariaDB schema management with Flyway
 * Unit, repository, controller, and integration tests
+
+Current domain safeguards include distinct customer/responder assignments, required participant roles, future session starts, ordered return and escalation deadlines, partial session updates, and conflict warnings before deactivating users or removing roles required by open sessions.
+
+### Time Handling
+
+Session and responder-availability requests provide local date-time values together with an IANA timezone such as `Europe/Oslo`. The backend validates daylight-saving transitions, converts accepted values to UTC `Instant` values for storage and comparison, and returns both UTC timestamps and the original domain timezone for frontend display.
+
+Audit timestamps and session events are also represented as UTC instants. Time-based rules use an injected UTC clock and therefore do not depend on the deployment server's timezone.
 
 Authentication, authorization, frontend development, notifications, scheduling, and deployment remain to be implemented.
 
@@ -38,7 +46,7 @@ Authentication, authorization, frontend development, notifications, scheduling, 
 
 ### Database
 
-* MariaDB (planned)
+* MariaDB
 
 ### Infrastructure
 

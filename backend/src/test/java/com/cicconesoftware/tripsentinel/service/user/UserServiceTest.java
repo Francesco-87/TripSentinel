@@ -1,7 +1,10 @@
 package com.cicconesoftware.tripsentinel.service.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -25,8 +28,10 @@ import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
+import com.cicconesoftware.tripsentinel.exception.ConflictException;
 import com.cicconesoftware.tripsentinel.mapper.user.UserMapper;
 import com.cicconesoftware.tripsentinel.repository.RoleRepository;
+import com.cicconesoftware.tripsentinel.repository.CheckInSessionRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
 
 class UserServiceTest {
@@ -36,6 +41,9 @@ class UserServiceTest {
 
     @Mock
     private RoleRepository roleRepository;
+
+    @Mock
+    private CheckInSessionRepository checkInSessionRepository;
 
     private UserService userService;
 
@@ -48,7 +56,8 @@ class UserServiceTest {
         userService = new UserServiceImpl(
                 userMapper,
                 userRepository,
-                roleRepository
+                roleRepository,
+                checkInSessionRepository
         );
     }
 
@@ -438,6 +447,66 @@ class UserServiceTest {
         verify(userRepository).findById(1L);
         verify(userRepository)
                 .save(existingUser);
+    }
+
+    @Test
+    void shouldWarnWhenDeactivatingResponderWithOpenSession() {
+        User existingUser = createUser();
+        Role responderRole = new Role();
+        responderRole.setName(RoleType.RESPONDER);
+        existingUser.setRoles(Set.of(responderRole));
+
+        AdminPatchUserRequestDto dto = new AdminPatchUserRequestDto();
+        dto.setStatus(UserStatus.INACTIVE);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(checkInSessionRepository.existsByResponderIdAndStatusIn(eq(1L), anySet()))
+                .thenReturn(true);
+
+        ConflictException exception = assertThrows(
+                ConflictException.class,
+                () -> userService.adminPatch(1L, dto));
+
+        assertEquals(
+                "Responder still has open check-in sessions; reassign or resolve them before deactivation",
+                exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void shouldWarnWhenRemovingCustomerRoleWithOpenSession() {
+        User existingUser = createUser();
+        AdminPatchUserRequestDto dto = new AdminPatchUserRequestDto();
+        dto.setRoles(Set.of(RoleType.RESPONDER));
+
+        Role responderRole = new Role();
+        responderRole.setName(RoleType.RESPONDER);
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(roleRepository.findByName(RoleType.RESPONDER)).thenReturn(Optional.of(responderRole));
+        when(checkInSessionRepository.existsByCustomerIdAndStatusIn(eq(1L), anySet()))
+                .thenReturn(true);
+
+        ConflictException exception = assertThrows(
+                ConflictException.class,
+                () -> userService.adminPatch(1L, dto));
+
+        assertEquals(
+                "Customer role cannot be removed while the user has open check-in sessions",
+                exception.getMessage());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void shouldRejectProfileUpdateForInactiveUser() {
+        User existingUser = createUser();
+        existingUser.setStatus(UserStatus.INACTIVE);
+        UserUpdateProfileRequestDto dto = new UserUpdateProfileRequestDto();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+
+        assertThrows(ConflictException.class, () -> userService.userUpdate(1L, dto));
+        verify(userRepository, never()).save(any(User.class));
     }
 
     private User createUser() {

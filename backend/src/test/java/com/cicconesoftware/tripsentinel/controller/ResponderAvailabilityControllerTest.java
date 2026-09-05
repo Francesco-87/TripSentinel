@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -68,6 +69,7 @@ class ResponderAvailabilityControllerTest {
 
         dto.setAvailableFrom(availableFrom);
         dto.setAvailableUntil(availableUntil);
+        dto.setTimeZone("Europe/Oslo");
 
         ResponderAvailabilityResponseDto response =
                 createResponseDto();
@@ -109,11 +111,12 @@ class ResponderAvailabilityControllerTest {
                 new ResponderAvailabilityResponseDto(
                         11L,
                         2L,
-                        LocalDateTime.of(2026, 9, 2, 8, 0),
-                        LocalDateTime.of(2026, 9, 2, 16, 0),
+                        Instant.parse("2026-09-02T06:00:00Z"),
+                        Instant.parse("2026-09-02T14:00:00Z"),
+                        "Europe/Oslo",
                         AvailabilityStatus.UNAVAILABLE,
-                        LocalDateTime.of(2026, 8, 30, 10, 0),
-                        LocalDateTime.of(2026, 8, 30, 10, 0)
+                        Instant.parse("2026-08-30T08:00:00Z"),
+                        Instant.parse("2026-08-30T08:00:00Z")
                 );
 
         when(responderAvailabilityService.getAll())
@@ -176,11 +179,12 @@ class ResponderAvailabilityControllerTest {
                 new ResponderAvailabilityResponseDto(
                         11L,
                         1L,
-                        LocalDateTime.of(2026, 9, 2, 8, 0),
-                        LocalDateTime.of(2026, 9, 2, 16, 0),
+                        Instant.parse("2026-09-02T06:00:00Z"),
+                        Instant.parse("2026-09-02T14:00:00Z"),
+                        "Europe/Oslo",
                         AvailabilityStatus.AVAILABLE,
-                        LocalDateTime.of(2026, 8, 30, 10, 0),
-                        LocalDateTime.of(2026, 8, 30, 10, 0)
+                        Instant.parse("2026-08-30T08:00:00Z"),
+                        Instant.parse("2026-08-30T08:00:00Z")
                 );
 
         when(responderAvailabilityService
@@ -223,16 +227,18 @@ class ResponderAvailabilityControllerTest {
         dto.setAvailableFrom(availableFrom);
         dto.setAvailableUntil(availableUntil);
         dto.setStatus(AvailabilityStatus.UNAVAILABLE);
+        dto.setTimeZone("Europe/Oslo");
 
         ResponderAvailabilityResponseDto response =
                 new ResponderAvailabilityResponseDto(
                         10L,
                         1L,
-                        availableFrom,
-                        availableUntil,
+                        Instant.parse("2026-09-02T08:00:00Z"),
+                        Instant.parse("2026-09-02T16:00:00Z"),
+                        "Europe/Oslo",
                         AvailabilityStatus.UNAVAILABLE,
-                        LocalDateTime.of(2026, 8, 30, 10, 0),
-                        LocalDateTime.of(2026, 8, 30, 11, 0)
+                        Instant.parse("2026-08-30T08:00:00Z"),
+                        Instant.parse("2026-08-30T09:00:00Z")
                 );
 
         when(responderAvailabilityService.update(
@@ -279,11 +285,12 @@ class ResponderAvailabilityControllerTest {
         return new ResponderAvailabilityResponseDto(
                 10L,
                 1L,
-                LocalDateTime.of(2026, 9, 1, 8, 0),
-                LocalDateTime.of(2026, 9, 1, 16, 0),
+                Instant.parse("2026-09-01T06:00:00Z"),
+                Instant.parse("2026-09-01T14:00:00Z"),
+                "Europe/Oslo",
                 AvailabilityStatus.AVAILABLE,
-                LocalDateTime.of(2026, 8, 30, 10, 0),
-                LocalDateTime.of(2026, 8, 30, 10, 0)
+                Instant.parse("2026-08-30T08:00:00Z"),
+                Instant.parse("2026-08-30T08:00:00Z")
         );
     }
 }

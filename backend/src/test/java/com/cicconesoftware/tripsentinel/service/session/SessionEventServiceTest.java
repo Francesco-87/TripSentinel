@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +41,7 @@ class SessionEventServiceTest {
     @Test
     void shouldGetSessionEventById() {
         // Arrange
-        LocalDateTime createdAt = LocalDateTime.now();
+        Instant createdAt = Instant.now();
 
         SessionEvent event = new SessionEvent();
         event.setEventType(SessionEventType.CREATED);

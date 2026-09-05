@@ -21,6 +21,8 @@ public class UpdateCheckInSessionRequestDto {
 
     private LocalDateTime latestCheckInAt;
 
+    private String timeZone;
+
     
     private String locationDescription;
 
@@ -64,6 +66,14 @@ public class UpdateCheckInSessionRequestDto {
 
     public void setLatestCheckInAt(LocalDateTime latestCheckInAt) {
         this.latestCheckInAt = latestCheckInAt;
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
     }
 
     public String getLocationDescription() {

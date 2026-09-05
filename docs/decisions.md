@@ -380,6 +380,7 @@ Represent the current session lifecycle through defined statuses:
 * `CHECKED_IN`
 * `MISSED`
 * `ESCALATED`
+* `COMPLETED`
 * `CANCELLED`
 
 **Reasoning**
@@ -929,3 +930,43 @@ The application already models ADMIN, CUSTOMER, and RESPONDER as domain roles.
 Authentication should determine **who the user is**, and authorization should enforce **which existing application operations that user may perform**.
 
 Security therefore becomes a protection layer around the established service/API design instead of becoming the structure that defines the application's business model.
+
+---
+
+# 2026-09-05
+
+## Inactive Users and Role Changes With Open Sessions
+
+**Decision**
+
+Inactive users cannot perform application operations and cannot be assigned to new sessions or responder availability.
+
+An administrator attempting to deactivate a user who still participates in an open session receives a conflict explaining that the session must be reassigned or resolved first. The same protection applies when removing a `CUSTOMER` or `RESPONDER` role required by an open session.
+
+Open sessions are those in `PLANNED`, `ACTIVE`, `CHECKED_IN`, `MISSED`, or `ESCALATED` status. Historical `COMPLETED` and `CANCELLED` sessions do not prevent deactivation or role changes.
+
+**Reasoning**
+
+Deactivation and role changes must not silently leave an ongoing safety session assigned to someone who can no longer use the application. Returning a conflict gives the administrator an explicit warning and allows the affected session to be handled deliberately before retrying the account change.
+
+Complete access enforcement will be added with authentication and authorization. Until then, the service layer prevents inactive users from entering new operational relationships.
+
+---
+
+## UTC Storage With Explicit Domain Timezones
+
+**Decision**
+
+Persist concrete moments as Java `Instant` values and configure Hibernate to communicate with the database in UTC. A check-in session and a responder availability slot also store the IANA timezone in which their local times were entered, such as `Europe/Oslo`.
+
+Creation and update requests accept local date-time values together with an IANA timezone. Services validate the timezone, reject local times that are missing or ambiguous during daylight-saving transitions, and convert accepted values to UTC instants before persistence. API responses return UTC instants together with the relevant timezone so the frontend can reproduce the intended local display.
+
+Time-based business rules use an injected UTC `Clock` rather than the server's default timezone.
+
+**Reasoning**
+
+`LocalDateTime` contains no timezone or UTC offset. Using it as a persisted moment would make behavior depend on the deployment server's configured timezone and would make identical clock values ambiguous across countries.
+
+UTC instants provide stable comparison and scheduling regardless of where the application runs. Retaining the IANA timezone preserves the user's intended local context and includes daylight-saving rules that a fixed offset alone cannot provide. The timezone belongs to each session or availability slot because users may travel between regions and should not be tied permanently to one account timezone.
+
+Existing rows receive `UTC` during migration because their previous `LocalDateTime` values contain no information from which their original timezone could be reconstructed. This is acceptable for the current development data; production migration would require an explicit legacy-timezone assumption or data-specific conversion plan.
