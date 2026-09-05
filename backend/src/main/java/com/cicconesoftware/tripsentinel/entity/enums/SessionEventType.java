@@ -1,5 +1,6 @@
 package com.cicconesoftware.tripsentinel.entity.enums;
 
+/** Defines the supported session event type values. */
 public enum SessionEventType {
     CREATED,
     RESPONDER_ASSIGNED,

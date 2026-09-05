@@ -8,11 +8,21 @@ The long-term goal is to provide a lightweight, privacy-focused alternative to t
 
 ## Current Status
 
-🚧 Project initialization.
+🚧 Backend foundation under active development.
 
-The repository structure is currently being set up. Features and documentation will be added incrementally as development progresses.
+The Spring Boot backend currently includes:
 
-## Planned Technology Stack
+* Users and roles
+* Responder availability
+* Check-in sessions and check-in methods
+* Session events
+* REST controllers, services, repositories, DTOs, and validation
+* MariaDB schema management with Flyway
+* Unit, repository, controller, and integration tests
+
+Authentication, authorization, frontend development, notifications, scheduling, and deployment remain to be implemented.
+
+## Technology Stack
 
 ### Frontend
 
@@ -23,7 +33,7 @@ The repository structure is currently being set up. Features and documentation w
 
 ### Backend
 
-* Java 21
+* Java 25
 * Spring Boot
 
 ### Database

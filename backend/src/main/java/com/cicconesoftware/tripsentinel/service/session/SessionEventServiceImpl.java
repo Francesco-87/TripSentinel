@@ -11,6 +11,7 @@ import com.cicconesoftware.tripsentinel.mapper.session.SessionEventMapper;
 import com.cicconesoftware.tripsentinel.repository.SessionEventRepository;
 
 @Service
+/** Implements the session event application operations. */
 public class SessionEventServiceImpl implements SessionEventService {
 
     private final SessionEventRepository repository;
@@ -40,7 +41,4 @@ public class SessionEventServiceImpl implements SessionEventService {
             .toList();
     }
 
-    /**TODO: Implement the following methods in the future if needed
-     * SessionEvent Session_CANCELED in the CheckInSessionServiceImpl class
-     */
 }

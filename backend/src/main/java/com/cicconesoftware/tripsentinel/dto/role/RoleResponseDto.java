@@ -2,6 +2,7 @@ package com.cicconesoftware.tripsentinel.dto.role;
 
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 
+/** Represents role data returned by the API. */
 public class RoleResponseDto {
 
     private final Long id;

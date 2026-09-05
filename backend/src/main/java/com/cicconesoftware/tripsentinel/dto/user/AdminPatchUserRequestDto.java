@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Email;
 
 
 
+/** Carries optional user changes; empty roles and blank phone values mean unchanged. */
 public class AdminPatchUserRequestDto {
 
     private String firstName;
@@ -25,7 +26,6 @@ public class AdminPatchUserRequestDto {
     private Set<RoleType> roles;
 
 
-    //Getters and Setters
 
     public String getFirstName() {
         return firstName;

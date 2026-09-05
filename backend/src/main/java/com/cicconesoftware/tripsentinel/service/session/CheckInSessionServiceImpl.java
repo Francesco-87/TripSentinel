@@ -21,6 +21,7 @@ import com.cicconesoftware.tripsentinel.repository.CheckInSessionRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
 
 @Service
+/** Implements the check in session application operations. */
 public class CheckInSessionServiceImpl implements CheckInSessionService {
 
     private final CheckInSessionRepository repository;

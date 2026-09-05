@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/roles")
-// Allows requests from the frontend running on localhost:5173 to access these endpoints
 @CrossOrigin(origins = "http://localhost:5173")
+/** Exposes HTTP endpoints for role operations. */
 public class RoleController {
 
     private final RoleService roleService;

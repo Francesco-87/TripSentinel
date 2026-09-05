@@ -168,6 +168,19 @@ class UserMapperTest {
     }
 
     @Test
+    void shouldKeepExistingPhoneNumberWhenAdminPatchPhoneNumberIsBlank() {
+        AdminPatchUserRequestDto requestDto = new AdminPatchUserRequestDto();
+        requestDto.setPhoneNumber("   ");
+
+        User user = new User();
+        user.setPhoneNumber("12345678");
+
+        userMapper.updateUserFromAdminPatchDto(requestDto, user);
+
+        assertEquals("12345678", user.getPhoneNumber());
+    }
+
+    @Test
     void shouldUpdateUserFromUserProfileDto() {
         // Arrange
         UserUpdateProfileRequestDto requestDto =

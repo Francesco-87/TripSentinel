@@ -27,8 +27,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/check-in-sessions")
-// Allows requests from the frontend running on localhost:5173 to access these endpoints
 @CrossOrigin(origins = "http://localhost:5173")
+/** Exposes HTTP endpoints for check in session operations. */
 public class CheckInSessionController {
 
     private final CheckInSessionService checkInSessionService;

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
 import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
 
+/** Provides persistence operations for check in method records. */
 public interface CheckInMethodRepository extends JpaRepository<CheckInMethod, Long> {
 
     Optional<CheckInMethod> findByName(CheckInMethodType name);

@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/** Carries data for creating a user. */
 public class CreateUserRequestDto {
 
     @NotBlank
@@ -23,7 +24,6 @@ public class CreateUserRequestDto {
     @Size(min = 12, max = 128)
     private String password;
 
-    // Getters and Setters
     public String getFirstName() {
         return firstName;
     }

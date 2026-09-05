@@ -6,6 +6,7 @@ import com.cicconesoftware.tripsentinel.dto.role.RoleResponseDto;
 import com.cicconesoftware.tripsentinel.entity.Role;
 
 @Component
+/** Maps between role entities and DTOs. */
 public class RoleMapper {
 
     public RoleResponseDto toRoleResponseDto(Role role) {

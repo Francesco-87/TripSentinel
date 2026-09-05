@@ -8,14 +8,14 @@ import com.cicconesoftware.tripsentinel.dto.responder.UpdateResponderAvailabilit
 import com.cicconesoftware.tripsentinel.entity.ResponderAvailability;
 
 @Component
+/** Maps between responder availability entities and DTOs. */
 public class ResponderAvailabilityMapper {
 
+    /** Maps the requested time range; owner and initial status are assigned by the service. */
     public ResponderAvailability toResponderAvailability(CreateResponderAvailabilityRequestDto dto) {
-          // Return null if input is null to prevent null pointer exceptions
         if (dto == null) {
             return null;
         }
-          // Create new entity and map all DTO fields to corresponding entity fields
         ResponderAvailability entity = new ResponderAvailability();
        
         entity.setAvailableFrom(dto.getAvailableFrom());
@@ -24,6 +24,7 @@ public class ResponderAvailabilityMapper {
     }
 
 
+    /** Replaces the time range and status while preserving the owning responder. */
     public void updateResponderAvailability(
         UpdateResponderAvailabilityRequestDto dto,
         ResponderAvailability entity) {

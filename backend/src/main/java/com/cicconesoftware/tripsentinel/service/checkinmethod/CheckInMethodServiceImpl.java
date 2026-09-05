@@ -12,6 +12,7 @@ import com.cicconesoftware.tripsentinel.mapper.checkinmethod.CheckInMethodMapper
 import com.cicconesoftware.tripsentinel.repository.CheckInMethodRepository;
 
 @Service
+/** Implements the check in method application operations. */
 public class CheckInMethodServiceImpl implements CheckInMethodService {
 
     private final CheckInMethodMapper checkInMethodMapper;

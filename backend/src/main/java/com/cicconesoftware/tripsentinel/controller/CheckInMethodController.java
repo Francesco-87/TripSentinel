@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
 @RequestMapping("/api/check-in-methods")
-// Allows requests from the frontend running on localhost:5173 to access these endpoints
 @CrossOrigin(origins = "http://localhost:5173")
+/** Exposes HTTP endpoints for check in method operations. */
 public class CheckInMethodController {
 
     private final CheckInMethodService checkInMethodService;

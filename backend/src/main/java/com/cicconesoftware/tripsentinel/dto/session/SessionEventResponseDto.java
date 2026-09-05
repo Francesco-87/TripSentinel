@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.cicconesoftware.tripsentinel.entity.enums.SessionEventType;
 
+/** Represents session event data returned by the API. */
 public class SessionEventResponseDto {
 
     private final Long id;

@@ -17,6 +17,7 @@ import com.cicconesoftware.tripsentinel.repository.UserRepository;
 
 
 @Service
+/** Implements the responder availability application operations. */
 public class ResponderAvailabilityServiceImpl implements ResponderAvailabilityService {
 
     private final ResponderAvailabilityMapper mapper;

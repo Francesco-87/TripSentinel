@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+/** Carries administrative data for replacing user details. */
 public class AdminUpdateUserRequestDto {
     
 
@@ -33,7 +34,6 @@ public class AdminUpdateUserRequestDto {
     @NotEmpty
     private Set<RoleType> roles;
 
-    //Getters and Setters
 
     public String getFirstName() {
         return firstName;

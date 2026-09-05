@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+/** Carries administrative data for creating a user. */
 public class AdminCreateUserRequestDto {
     
     @NotBlank
@@ -36,7 +37,6 @@ public class AdminCreateUserRequestDto {
     @NotEmpty
     private Set<RoleType> roles;
 
-    //Getters and Setters
     public String getFirstName() {
         return firstName;
     }

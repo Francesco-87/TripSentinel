@@ -6,6 +6,7 @@ import com.cicconesoftware.tripsentinel.dto.session.SessionEventResponseDto;
 import com.cicconesoftware.tripsentinel.entity.SessionEvent;
 
 @Component
+/** Maps between session event entities and DTOs. */
 public class SessionEventMapper {
 
     public SessionEventResponseDto toSessionEventResponseDto(SessionEvent sessionEvent) {

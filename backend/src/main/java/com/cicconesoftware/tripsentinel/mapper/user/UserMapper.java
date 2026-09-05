@@ -13,8 +13,10 @@ import com.cicconesoftware.tripsentinel.dto.user.UserUpdateProfileRequestDto;
 import com.cicconesoftware.tripsentinel.entity.User;
 
 @Component
+/** Maps between user entities and DTOs. */
 public class UserMapper {
 
+    /** Maps administrator-controlled fields; role associations are resolved by the service. */
     public User toUserEntity(AdminCreateUserRequestDto userRequestDto) {
         if (userRequestDto == null) {
             return null;
@@ -22,7 +24,7 @@ public class UserMapper {
 
         User user = new User();
 
-        // TODO: hash password when authentication/security is implemented
+        // TODO(auth): Encode the password before any user is persisted.
 
         user.setFirstName(userRequestDto.getFirstName());
         user.setLastName(userRequestDto.getLastName());
@@ -34,6 +36,7 @@ public class UserMapper {
         return user;
     }
 
+    /** Maps self-registration fields; default role and status are assigned by the service. */
     public User toUserEntity(CreateUserRequestDto userRequestDto) {
         if (userRequestDto == null) {
             return null;
@@ -41,7 +44,7 @@ public class UserMapper {
 
         User user = new User();
 
-        // TODO: hash password when authentication/security is implemented
+        // TODO(auth): Encode the password before any user is persisted.
 
         user.setFirstName(userRequestDto.getFirstName());
         user.setLastName(userRequestDto.getLastName());
@@ -52,6 +55,7 @@ public class UserMapper {
         return user;
     }
 
+    /** Replaces administrator-editable scalar fields; roles are handled by the service. */
     public void updateUserFromAdminDto(
             AdminUpdateUserRequestDto dto,
             User user) {
@@ -67,6 +71,7 @@ public class UserMapper {
         user.setStatus(dto.getStatus());
     }
 
+    /** Replaces only profile fields available to a regular user. */
     public void updateUserFromUserDto(
             UserUpdateProfileRequestDto userRequestDto,
             User user) {
@@ -81,6 +86,7 @@ public class UserMapper {
         user.setPhoneNumber(userRequestDto.getPhoneNumber());
     }
 
+    /** Applies supplied administrator fields; a blank phone number is treated as omitted. */
     public void updateUserFromAdminPatchDto(
             AdminPatchUserRequestDto dto,
             User user) {
@@ -98,7 +104,7 @@ public class UserMapper {
         if (dto.getEmail() != null) {
             user.setEmail(dto.getEmail());
         }
-        if (dto.getPhoneNumber() != null) {
+        if (dto.getPhoneNumber() != null && !dto.getPhoneNumber().isBlank()) {
             user.setPhoneNumber(dto.getPhoneNumber());
         }
         if (dto.getStatus() != null) {

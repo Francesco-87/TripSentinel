@@ -6,6 +6,7 @@ import com.cicconesoftware.tripsentinel.dto.checkinmethod.CheckInMethodResponseD
 import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
 
 @Component
+/** Maps between check in method entities and DTOs. */
 public class CheckInMethodMapper {
 
     public CheckInMethodResponseDto toCheckInMethodResponseDto(CheckInMethod checkInMethod) {

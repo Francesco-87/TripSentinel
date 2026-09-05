@@ -13,6 +13,7 @@ import com.cicconesoftware.tripsentinel.mapper.checkinmethod.CheckInMethodMapper
 
 
 @Component
+/** Maps between check in session entities and DTOs. */
 public class CheckInSessionMapper {
 
 
@@ -28,6 +29,7 @@ public class CheckInSessionMapper {
         }
 
 
+    /** Maps session details; customer, responder, methods, and status are assigned by the service. */
     public CheckInSession toCheckInSessionEntity(AdminCreateCheckInSessionRequestDto dto){
          if (dto == null) {
             return null;
@@ -44,6 +46,7 @@ public class CheckInSessionMapper {
 
     }
 
+    /** Maps session details; customer, responder, methods, and status are assigned by the service. */
      public CheckInSession toCheckInSessionEntity(CreateCheckInSessionRequestDto dto){
          if (dto == null) {
             return null;
@@ -59,6 +62,7 @@ public class CheckInSessionMapper {
         return checkInSession;
     }
 
+    /** Replaces scalar session details without changing participants, methods, or status. */
      public void updateCheckInSession(
         UpdateCheckInSessionRequestDto dto,
         CheckInSession session) {

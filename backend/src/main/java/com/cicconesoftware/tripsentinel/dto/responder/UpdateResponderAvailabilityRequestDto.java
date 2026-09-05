@@ -6,6 +6,7 @@ import com.cicconesoftware.tripsentinel.entity.enums.AvailabilityStatus;
 
 import jakarta.validation.constraints.NotNull;
 
+/** Carries data for updating a responder availability slot. */
 public class UpdateResponderAvailabilityRequestDto {
     
 

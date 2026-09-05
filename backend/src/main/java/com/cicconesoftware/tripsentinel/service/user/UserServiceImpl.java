@@ -23,6 +23,7 @@ import com.cicconesoftware.tripsentinel.repository.RoleRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
 
 @Service
+/** Implements the user application operations. */
 public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
@@ -110,7 +111,8 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
 
         userMapper.updateUserFromAdminPatchDto(dto, existingUser);
 
-        if (dto.getRoles() != null) {
+        // An omitted or empty role set means that existing role assignments are unchanged.
+        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
             Set<Role> roles = dto.getRoles().stream()
                     .map(roleType -> roleRepository.findByName(roleType)
                             .orElseThrow(() -> new ResourceNotFoundException("Role not found with name: " + roleType)))
@@ -153,6 +155,7 @@ existingUser.setRoles(roles);
         if (userRepository.existsByEmailAndIdNot(dto.getEmail(), id)) {
         throw new ConflictException("User already exists with email: " + dto.getEmail());
         }
+        // TODO(email-verification): Keep the current email until the requested address is verified.
         userMapper.updateUserFromUserDto(dto, existingUser);
         
         User savedUser = userRepository.save(existingUser);

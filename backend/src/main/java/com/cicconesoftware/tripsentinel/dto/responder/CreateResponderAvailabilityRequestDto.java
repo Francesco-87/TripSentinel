@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.validation.constraints.NotNull;
 
+/** Carries data for creating a responder availability slot. */
 public class CreateResponderAvailabilityRequestDto {
     
     @NotNull

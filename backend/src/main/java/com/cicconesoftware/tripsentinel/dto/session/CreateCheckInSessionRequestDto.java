@@ -6,6 +6,7 @@ import java.util.Set;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+/** Carries data for creating a check-in session. */
 public class CreateCheckInSessionRequestDto {
     
     @NotNull

@@ -6,6 +6,7 @@ import java.util.Set;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+/** Carries administrative data for creating a check-in session. */
 public class AdminCreateCheckInSessionRequestDto {
 
     @NotNull
@@ -31,7 +32,6 @@ public class AdminCreateCheckInSessionRequestDto {
 
     private String importantNotes;
 
-    // Getters and Setters
     public Long getCustomerId() {
         return customerId;
     }

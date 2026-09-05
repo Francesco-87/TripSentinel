@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import com.cicconesoftware.tripsentinel.entity.enums.AvailabilityStatus;
 
+/** Represents responder availability data returned by the API. */
 public class ResponderAvailabilityResponseDto {
 
     private final Long id;

@@ -2,6 +2,7 @@ package com.cicconesoftware.tripsentinel.dto.checkinmethod;
 
 import com.cicconesoftware.tripsentinel.entity.enums.CheckInMethodType;
 
+/** Represents check in method data returned by the API. */
 public class CheckInMethodResponseDto {
 
     private final Long id;

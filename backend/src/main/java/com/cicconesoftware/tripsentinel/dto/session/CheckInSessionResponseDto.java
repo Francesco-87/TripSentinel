@@ -6,6 +6,7 @@ import java.util.Set;
 import com.cicconesoftware.tripsentinel.dto.checkinmethod.CheckInMethodResponseDto;
 import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
 
+/** Represents check in session data returned by the API. */
 public class CheckInSessionResponseDto {
 
     private final Long id;

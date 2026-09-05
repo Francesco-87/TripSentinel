@@ -6,25 +6,30 @@ import com.cicconesoftware.tripsentinel.dto.responder.CreateResponderAvailabilit
 import com.cicconesoftware.tripsentinel.dto.responder.ResponderAvailabilityResponseDto;
 import com.cicconesoftware.tripsentinel.dto.responder.UpdateResponderAvailabilityRequestDto;
 
+/** Defines operations for managing responder availability data. */
 public interface ResponderAvailabilityService {
 
-ResponderAvailabilityResponseDto getById(Long id);
+    /** Returns one availability slot or fails when the ID does not exist. */
+    ResponderAvailabilityResponseDto getById(Long id);
 
-List<ResponderAvailabilityResponseDto> getAll();
+    /** Returns all availability slots; no result order is guaranteed. */
+    List<ResponderAvailabilityResponseDto> getAll();
 
-List<ResponderAvailabilityResponseDto> getByResponderId(Long responderId);
+    /** Returns all availability slots belonging to a responder. */
+    List<ResponderAvailabilityResponseDto> getByResponderId(Long responderId);
 
-ResponderAvailabilityResponseDto create(
-    Long responderId,
-    CreateResponderAvailabilityRequestDto dto
-);
+    /** Creates an available slot owned by the supplied responder. */
+    ResponderAvailabilityResponseDto create(
+        Long responderId,
+        CreateResponderAvailabilityRequestDto dto
+    );
 
-ResponderAvailabilityResponseDto update(
-    Long id,
-    UpdateResponderAvailabilityRequestDto dto
-);
+    /** Replaces the time range and status of an availability slot. */
+    ResponderAvailabilityResponseDto update(
+        Long id,
+        UpdateResponderAvailabilityRequestDto dto
+    );
 
-void delete(Long id);
-
-    
+    /** Permanently deletes an availability slot. */
+    void delete(Long id);
 }

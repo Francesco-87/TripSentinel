@@ -331,6 +331,21 @@ class UserServiceTest {
     }
 
     @Test
+    void shouldAdminPatchUserWithoutChangingRolesWhenRoleSetIsEmpty() {
+        User existingUser = createUser();
+        AdminPatchUserRequestDto dto = new AdminPatchUserRequestDto();
+        dto.setRoles(Set.of());
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(existingUser)).thenReturn(existingUser);
+
+        UserResponseDto result = userService.adminPatch(1L, dto);
+
+        assertEquals(Set.of(RoleType.CUSTOMER), result.getRoles());
+        verify(roleRepository, never()).findByName(any(RoleType.class));
+    }
+
+    @Test
     void shouldAdminPatchUserRoles() {
         // Arrange
         User existingUser = createUser();

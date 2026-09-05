@@ -13,6 +13,7 @@ import com.cicconesoftware.tripsentinel.exception.ResourceNotFoundException;
 
 
 @Service
+/** Implements the role application operations. */
 public class RoleServiceImpl implements RoleService{
 
     private final RoleMapper roleMapper;

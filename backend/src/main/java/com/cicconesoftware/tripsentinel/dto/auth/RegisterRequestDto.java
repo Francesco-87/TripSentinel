@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/** Carries the information needed to register a user. */
 public class RegisterRequestDto {
 
     @NotBlank

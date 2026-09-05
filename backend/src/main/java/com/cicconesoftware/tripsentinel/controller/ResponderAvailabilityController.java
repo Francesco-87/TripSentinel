@@ -27,13 +27,12 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/responder-availability")
-// Allows requests from the frontend running on localhost:5173 to access these endpoints
 @CrossOrigin(origins = "http://localhost:5173")
+/** Exposes HTTP endpoints for responder availability operations. */
 public class ResponderAvailabilityController {
 
     private final ResponderAvailabilityService responderAvailabilityService;
 
-    // Constructor that injects the ResponderAvailabilityService dependency
     public ResponderAvailabilityController(ResponderAvailabilityService responderAvailabilityService) {
         this.responderAvailabilityService = responderAvailabilityService;
     }
@@ -46,7 +45,6 @@ public class ResponderAvailabilityController {
     }
     
 
-    // GET endpoint to retrieve all responder availability records
     @GetMapping
     public List<ResponderAvailabilityResponseDto> getAllResponderAvailability() {
         return responderAvailabilityService.getAll();
@@ -71,7 +69,6 @@ public class ResponderAvailabilityController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteResponderAvailability(@PathVariable Long id) {
-        // Deletes a responder availability record by ID; returns no content on success
         responderAvailabilityService.delete(id);
     } 
     

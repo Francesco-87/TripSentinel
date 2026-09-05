@@ -14,6 +14,7 @@ import com.cicconesoftware.tripsentinel.service.session.SessionEventService;
 @RestController
 @RequestMapping("/api/session-events")
 @CrossOrigin(origins = "http://localhost:5173")
+/** Exposes HTTP endpoints for session event operations. */
 public class SessionEventController {
 
     private final SessionEventService sessionEventService;

@@ -6,6 +6,7 @@ import java.util.Set;
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
 
+/** Represents user data returned by the API. */
 public class UserResponseDto {
 
     private final Long id;

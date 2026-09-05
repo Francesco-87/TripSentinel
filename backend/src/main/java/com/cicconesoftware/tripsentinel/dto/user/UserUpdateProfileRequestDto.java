@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 
+/** Carries data for updating a user's profile. */
 public class UserUpdateProfileRequestDto {
     
 

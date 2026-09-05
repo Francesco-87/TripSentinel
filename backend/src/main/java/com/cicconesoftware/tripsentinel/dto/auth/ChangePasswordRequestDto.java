@@ -3,6 +3,7 @@ package com.cicconesoftware.tripsentinel.dto.auth;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+/** Carries the information needed to change a password. */
 public class ChangePasswordRequestDto {
 
     @NotBlank
@@ -42,4 +43,3 @@ public class ChangePasswordRequestDto {
     }
 
 }
-    
