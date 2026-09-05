@@ -131,6 +131,7 @@ public class CheckInSession {
         this.expectedReturnAt = expectedReturnAt;
     }
 
+    /** Returns the customer-defined deadline after which the session may escalate. */
     public LocalDateTime getLatestCheckInAt() {
         return latestCheckInAt;
     }

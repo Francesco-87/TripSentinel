@@ -4,26 +4,21 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /** Carries data for updating a check-in session. */
 public class UpdateCheckInSessionRequestDto {
 
 
-   @NotNull
     private Long responderId;
 
-    @NotEmpty
+    @Size(min = 1)
     private Set<Long> checkInMethodIds;
 
-    @NotNull
     private LocalDateTime startAt;
 
-    @NotNull
     private LocalDateTime expectedReturnAt;
 
-    @NotNull
     private LocalDateTime latestCheckInAt;
 
     

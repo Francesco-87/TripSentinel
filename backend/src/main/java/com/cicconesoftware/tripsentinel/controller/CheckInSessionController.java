@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
@@ -71,7 +71,7 @@ public class CheckInSessionController {
         return checkInSessionService.createCheckInSessionForUser(dto, userId);
     }
 
-   @PutMapping("/{sessionId}")
+   @PatchMapping("/{sessionId}")
    public CheckInSessionResponseDto updateCheckInSession(
         @RequestBody @Valid UpdateCheckInSessionRequestDto dto,
         @PathVariable Long sessionId) {

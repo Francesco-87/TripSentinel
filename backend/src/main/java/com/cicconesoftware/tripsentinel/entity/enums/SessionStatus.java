@@ -7,5 +7,6 @@ public enum SessionStatus {
     CHECKED_IN,
     MISSED,
     ESCALATED,
+    COMPLETED,
     CANCELLED
 }

@@ -70,6 +70,7 @@ public class CheckInSessionResponseDto {
         return expectedReturnAt;
     }
 
+    /** Returns the deadline after which a missed return may be escalated. */
     public LocalDateTime getLatestCheckInAt() {
         return latestCheckInAt;
     }

@@ -22,13 +22,13 @@ public interface CheckInSessionService {
     /** Returns all sessions; no result order is guaranteed. */
     List<CheckInSessionResponseDto> getAll();
 
-    /** Creates a planned session using administrator-supplied customer and responder IDs. */
+    /** Creates a future planned session for distinct customer and responder role holders. */
     CheckInSessionResponseDto adminCreateCheckInSession(AdminCreateCheckInSessionRequestDto dto);
 
-    /** Creates a planned session with the supplied user ID as its customer. */
+    /** Creates a future planned session with the supplied customer and a distinct responder. */
     CheckInSessionResponseDto createCheckInSessionForUser(CreateCheckInSessionRequestDto dto, Long userId);
 
-    /** Replaces the editable scalar details of an existing session. */
+    /** Applies supplied session details, including optional responder and method changes. */
     CheckInSessionResponseDto updateCheckInSession(UpdateCheckInSessionRequestDto dto, Long sessionId);
 
     /** Cancels a session by changing its status; the record is preserved. */

@@ -2,9 +2,11 @@ package com.cicconesoftware.tripsentinel.service.session;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -20,8 +22,11 @@ import com.cicconesoftware.tripsentinel.dto.session.CreateCheckInSessionRequestD
 import com.cicconesoftware.tripsentinel.dto.session.UpdateCheckInSessionRequestDto;
 import com.cicconesoftware.tripsentinel.entity.CheckInMethod;
 import com.cicconesoftware.tripsentinel.entity.CheckInSession;
+import com.cicconesoftware.tripsentinel.entity.Role;
 import com.cicconesoftware.tripsentinel.entity.User;
+import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
 import com.cicconesoftware.tripsentinel.entity.enums.SessionStatus;
+import com.cicconesoftware.tripsentinel.exception.BadRequestException;
 import com.cicconesoftware.tripsentinel.mapper.session.CheckInSessionMapper;
 import com.cicconesoftware.tripsentinel.repository.CheckInMethodRepository;
 import com.cicconesoftware.tripsentinel.repository.CheckInSessionRepository;
@@ -176,9 +181,14 @@ class CheckInSessionServiceTest {
         dto.setCustomerId(1L);
         dto.setResponderId(2L);
         dto.setCheckInMethodIds(Set.of(10L));
+        dto.setStartAt(LocalDateTime.now().plusDays(1));
+        dto.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
+        dto.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
 
         User customer = new User();
         User responder = new User();
+        customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
+        responder.setRoles(Set.of(role(RoleType.RESPONDER)));
 
         CheckInMethod method = new CheckInMethod();
 
@@ -235,9 +245,14 @@ class CheckInSessionServiceTest {
 
         dto.setResponderId(2L);
         dto.setCheckInMethodIds(Set.of(10L));
+        dto.setStartAt(LocalDateTime.now().plusDays(1));
+        dto.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
+        dto.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
 
         User customer = new User();
         User responder = new User();
+        customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
+        responder.setRoles(Set.of(role(RoleType.RESPONDER)));
 
         CheckInMethod method = new CheckInMethod();
 
@@ -287,6 +302,47 @@ class CheckInSessionServiceTest {
     }
 
     @Test
+    void shouldRejectSessionWhenCustomerAndResponderAreTheSameUser() {
+        CreateCheckInSessionRequestDto dto = validCreateDto();
+        User user = new User();
+        user.setRoles(Set.of(role(RoleType.CUSTOMER), role(RoleType.RESPONDER)));
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+
+        assertThrows(BadRequestException.class, () -> service.createCheckInSessionForUser(dto, 1L));
+    }
+
+    @Test
+    void shouldRejectSessionWhenAssignedUserIsNotAResponder() {
+        CreateCheckInSessionRequestDto dto = validCreateDto();
+        User customer = new User();
+        User responder = new User();
+        customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
+        responder.setRoles(Set.of(role(RoleType.CUSTOMER)));
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(responder));
+
+        assertThrows(BadRequestException.class, () -> service.createCheckInSessionForUser(dto, 1L));
+    }
+
+    @Test
+    void shouldRejectSessionThatStartsInThePast() {
+        CreateCheckInSessionRequestDto dto = validCreateDto();
+        dto.setStartAt(LocalDateTime.now().minusHours(1));
+        User customer = new User();
+        User responder = new User();
+        customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
+        responder.setRoles(Set.of(role(RoleType.RESPONDER)));
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(customer));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(responder));
+
+        assertThrows(BadRequestException.class, () -> service.createCheckInSessionForUser(dto, 1L));
+    }
+
+    @Test
     void shouldUpdateSession() {
         // Arrange
         UpdateCheckInSessionRequestDto dto =
@@ -294,6 +350,9 @@ class CheckInSessionServiceTest {
 
         CheckInSession existingSession =
                 new CheckInSession();
+        existingSession.setStartAt(LocalDateTime.now().plusDays(1));
+        existingSession.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
+        existingSession.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
 
         CheckInSessionResponseDto responseDto =
                 org.mockito.Mockito.mock(CheckInSessionResponseDto.class);
@@ -318,6 +377,40 @@ class CheckInSessionServiceTest {
                 .updateCheckInSession(dto, existingSession);
 
         verify(repository).save(existingSession);
+    }
+
+    @Test
+    void shouldUpdateResponderAndCheckInMethodsWhenSupplied() {
+        UpdateCheckInSessionRequestDto dto = new UpdateCheckInSessionRequestDto();
+        dto.setResponderId(3L);
+        dto.setCheckInMethodIds(Set.of(10L));
+
+        User customer = new User();
+        customer.setRoles(Set.of(role(RoleType.CUSTOMER)));
+        User responder = new User();
+        responder.setRoles(Set.of(role(RoleType.RESPONDER)));
+        CheckInMethod method = new CheckInMethod();
+
+        CheckInSession session = new CheckInSession();
+        session.setCustomer(customer);
+        session.setStartAt(LocalDateTime.now().plusDays(1));
+        session.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
+        session.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
+
+        CheckInSessionResponseDto responseDto =
+                org.mockito.Mockito.mock(CheckInSessionResponseDto.class);
+
+        when(repository.findById(1L)).thenReturn(Optional.of(session));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(responder));
+        when(checkInMethodRepository.findAllById(Set.of(10L))).thenReturn(List.of(method));
+        when(repository.save(session)).thenReturn(session);
+        when(mapper.toCheckInSessionResponseDto(session)).thenReturn(responseDto);
+
+        CheckInSessionResponseDto result = service.updateCheckInSession(dto, 1L);
+
+        assertSame(responseDto, result);
+        assertSame(responder, session.getResponder());
+        assertEquals(Set.of(method), session.getCheckInMethods());
     }
 
     @Test
@@ -351,5 +444,21 @@ class CheckInSessionServiceTest {
         );
 
         verify(repository).save(session);
+    }
+
+    private Role role(RoleType roleType) {
+        Role role = new Role();
+        role.setName(roleType);
+        return role;
+    }
+
+    private CreateCheckInSessionRequestDto validCreateDto() {
+        CreateCheckInSessionRequestDto dto = new CreateCheckInSessionRequestDto();
+        dto.setResponderId(2L);
+        dto.setCheckInMethodIds(Set.of(10L));
+        dto.setStartAt(LocalDateTime.now().plusDays(1));
+        dto.setExpectedReturnAt(LocalDateTime.now().plusDays(1).plusHours(4));
+        dto.setLatestCheckInAt(LocalDateTime.now().plusDays(1).plusHours(5));
+        return dto;
     }
 }

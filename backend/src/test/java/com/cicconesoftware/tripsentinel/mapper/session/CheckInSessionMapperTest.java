@@ -2,6 +2,7 @@ package com.cicconesoftware.tripsentinel.mapper.session;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -134,16 +135,14 @@ class CheckInSessionMapperTest {
     }
 
     @Test
-    void shouldDoNothingWhenUpdateCheckInSessionRequestDtoIsNull() {
+    void shouldFailWhenUpdateCheckInSessionRequestDtoIsNull() {
         // Arrange
         CheckInSession session = new CheckInSession();
-        session.setLocationDescription("Existing location");
 
-        // Act
-        checkInSessionMapper.updateCheckInSession(null, session);
-
-        // Assert
-        assertEquals("Existing location", session.getLocationDescription());
+        // Act and assert
+        assertThrows(
+                NullPointerException.class,
+                () -> checkInSessionMapper.updateCheckInSession(null, session));
     }
 
     @Test

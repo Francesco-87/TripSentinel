@@ -62,20 +62,26 @@ public class CheckInSessionMapper {
         return checkInSession;
     }
 
-    /** Replaces scalar session details without changing participants, methods, or status. */
+    /** Applies supplied scalar details without changing participants, methods, or status. */
      public void updateCheckInSession(
         UpdateCheckInSessionRequestDto dto,
         CheckInSession session) {
 
-    if (dto == null || session == null) {
-        return;
+    if (dto.getStartAt() != null) {
+        session.setStartAt(dto.getStartAt());
     }
-
-    session.setStartAt(dto.getStartAt());
-    session.setExpectedReturnAt(dto.getExpectedReturnAt());
-    session.setLatestCheckInAt(dto.getLatestCheckInAt());
-    session.setLocationDescription(dto.getLocationDescription());
-    session.setImportantNotes(dto.getImportantNotes());
+    if (dto.getExpectedReturnAt() != null) {
+        session.setExpectedReturnAt(dto.getExpectedReturnAt());
+    }
+    if (dto.getLatestCheckInAt() != null) {
+        session.setLatestCheckInAt(dto.getLatestCheckInAt());
+    }
+    if (dto.getLocationDescription() != null) {
+        session.setLocationDescription(dto.getLocationDescription());
+    }
+    if (dto.getImportantNotes() != null) {
+        session.setImportantNotes(dto.getImportantNotes());
+    }
     }
 
 
