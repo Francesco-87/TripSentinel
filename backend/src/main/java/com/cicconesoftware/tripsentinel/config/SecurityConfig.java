@@ -15,7 +15,7 @@ public class SecurityConfig {
         http
             // Authentication is deferred; allow prototype API writes without CSRF tokens.
             .csrf(csrf -> csrf.disable())
-            // Use the existing Spring MVC CORS rules, including controller @CrossOrigin annotations.
+            // Use the centralized Spring MVC rules defined in CorsConfig.
             .cors(Customizer.withDefaults())
             // Allow every HTTP method while authentication and authorization are deferred.
             .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())

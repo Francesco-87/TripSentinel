@@ -3,7 +3,6 @@ package com.cicconesoftware.tripsentinel.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,7 +26,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/check-in-sessions")
-@CrossOrigin(origins = "http://localhost:5173")
 /** Exposes HTTP endpoints for check in session operations. */
 public class CheckInSessionController {
 

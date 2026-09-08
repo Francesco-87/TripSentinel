@@ -2,7 +2,6 @@ package com.cicconesoftware.tripsentinel.controller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +12,6 @@ import com.cicconesoftware.tripsentinel.service.session.SessionEventService;
 
 @RestController
 @RequestMapping("/api/session-events")
-@CrossOrigin(origins = "http://localhost:5173")
 /** Exposes HTTP endpoints for session event operations. */
 public class SessionEventController {
 
