@@ -122,7 +122,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
         session.setLatestCheckInAt(latestCheckInAt);
         session.setTimeZone(timeZone.getId());
 
-        CheckInSession savedSession = repository.save(session);
+        CheckInSession savedSession = repository.saveAndFlush(session);
 
         return mapper.toCheckInSessionResponseDto(savedSession);
     }
@@ -162,7 +162,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
         session.setLatestCheckInAt(latestCheckInAt);
         session.setTimeZone(timeZone.getId());
 
-        CheckInSession savedSession = repository.save(session);
+        CheckInSession savedSession = repository.saveAndFlush(session);
 
         return mapper.toCheckInSessionResponseDto(savedSession);
     }
@@ -204,7 +204,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
 
         mapper.updateCheckInSession(dto, session);
         validateUpdatedSessionTimes(dto, session);
-        session = repository.save(session);
+        session = repository.saveAndFlush(session);
         return mapper.toCheckInSessionResponseDto(session);
     }
 
@@ -213,7 +213,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
         CheckInSession session = repository.findById(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Check-in session not found with id: " + sessionId));
         session.setStatus(SessionStatus.CANCELLED);
-        session = repository.save(session);
+        session = repository.saveAndFlush(session);
         return mapper.toCheckInSessionResponseDto(session);
     }
 

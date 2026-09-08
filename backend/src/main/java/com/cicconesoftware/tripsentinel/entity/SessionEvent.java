@@ -2,6 +2,9 @@ package com.cicconesoftware.tripsentinel.entity;
 
 import java.time.Instant;
 
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
+
 import com.cicconesoftware.tripsentinel.entity.enums.SessionEventType;
 
 import jakarta.persistence.Column;
@@ -31,7 +34,8 @@ public class SessionEvent {
     @Column(name = "note", columnDefinition = "TEXT")
     private String note;
 
-    @Column(name = "created_at", nullable = false)
+    @Generated(event = EventType.INSERT)
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private Instant createdAt;
 
     public SessionEvent() {

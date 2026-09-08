@@ -1,6 +1,9 @@
 package com.cicconesoftware.tripsentinel.entity;
 
 import java.time.Instant;
+
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -51,10 +54,12 @@ public class CheckInSession {
     @Column(name = "status", nullable = false, length = 30)
     private SessionStatus status;
 
-    @Column(name  = "created_at", nullable = false)
+    @Generated(event = EventType.INSERT)
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Generated(event = {EventType.INSERT, EventType.UPDATE})
+    @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
     private Instant updatedAt;
 
     public CheckInSession() {

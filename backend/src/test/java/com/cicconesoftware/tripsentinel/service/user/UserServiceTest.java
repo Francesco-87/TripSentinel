@@ -146,7 +146,7 @@ class UserServiceTest {
         when(roleRepository.findByName(RoleType.CUSTOMER))
                 .thenReturn(Optional.of(customerRole));
 
-        when(userRepository.save(any(User.class)))
+        when(userRepository.saveAndFlush(any(User.class)))
                 .thenAnswer(
                         invocation -> invocation.getArgument(0)
                 );
@@ -177,7 +177,7 @@ class UserServiceTest {
                 .findByName(RoleType.CUSTOMER);
 
         verify(userRepository)
-                .save(any(User.class));
+                .saveAndFlush(any(User.class));
     }
 
     @Test
@@ -200,7 +200,7 @@ class UserServiceTest {
         when(roleRepository.findByName(RoleType.CUSTOMER))
                 .thenReturn(Optional.of(customerRole));
 
-        when(userRepository.save(any(User.class)))
+        when(userRepository.saveAndFlush(any(User.class)))
                 .thenAnswer(
                         invocation -> invocation.getArgument(0)
                 );
@@ -227,7 +227,7 @@ class UserServiceTest {
                 .findByName(RoleType.CUSTOMER);
 
         verify(userRepository)
-                .save(any(User.class));
+                .saveAndFlush(any(User.class));
     }
 
     @Test
@@ -254,7 +254,7 @@ class UserServiceTest {
         when(roleRepository.findByName(RoleType.RESPONDER))
                 .thenReturn(Optional.of(responderRole));
 
-        when(userRepository.save(existingUser))
+        when(userRepository.saveAndFlush(existingUser))
                 .thenReturn(existingUser);
 
         // Act
@@ -285,7 +285,7 @@ class UserServiceTest {
                 .findByName(RoleType.RESPONDER);
 
         verify(userRepository)
-                .save(existingUser);
+                .saveAndFlush(existingUser);
     }
 
     @Test
@@ -301,7 +301,7 @@ class UserServiceTest {
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(existingUser));
 
-        when(userRepository.save(existingUser))
+        when(userRepository.saveAndFlush(existingUser))
                 .thenReturn(existingUser);
 
         // Act
@@ -336,7 +336,7 @@ class UserServiceTest {
                 .findByName(any(RoleType.class));
 
         verify(userRepository)
-                .save(existingUser);
+                .saveAndFlush(existingUser);
     }
 
     @Test
@@ -346,7 +346,7 @@ class UserServiceTest {
         dto.setRoles(Set.of());
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
-        when(userRepository.save(existingUser)).thenReturn(existingUser);
+        when(userRepository.saveAndFlush(existingUser)).thenReturn(existingUser);
 
         UserResponseDto result = userService.adminPatch(1L, dto);
 
@@ -373,7 +373,7 @@ class UserServiceTest {
         when(roleRepository.findByName(RoleType.RESPONDER))
                 .thenReturn(Optional.of(responderRole));
 
-        when(userRepository.save(existingUser))
+        when(userRepository.saveAndFlush(existingUser))
                 .thenReturn(existingUser);
 
         // Act
@@ -400,7 +400,7 @@ class UserServiceTest {
                 .findByName(RoleType.RESPONDER);
 
         verify(userRepository)
-                .save(existingUser);
+                .saveAndFlush(existingUser);
     }
 
     @Test
@@ -419,7 +419,7 @@ class UserServiceTest {
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(existingUser));
 
-        when(userRepository.save(existingUser))
+        when(userRepository.saveAndFlush(existingUser))
                 .thenReturn(existingUser);
 
         // Act
@@ -446,7 +446,7 @@ class UserServiceTest {
 
         verify(userRepository).findById(1L);
         verify(userRepository)
-                .save(existingUser);
+                .saveAndFlush(existingUser);
     }
 
     @Test
@@ -470,7 +470,7 @@ class UserServiceTest {
         assertEquals(
                 "Responder still has open check-in sessions; reassign or resolve them before deactivation",
                 exception.getMessage());
-        verify(userRepository, never()).save(any(User.class));
+        verify(userRepository, never()).saveAndFlush(any(User.class));
     }
 
     @Test
@@ -494,7 +494,7 @@ class UserServiceTest {
         assertEquals(
                 "Customer role cannot be removed while the user has open check-in sessions",
                 exception.getMessage());
-        verify(userRepository, never()).save(any(User.class));
+        verify(userRepository, never()).saveAndFlush(any(User.class));
     }
 
     @Test
@@ -506,7 +506,7 @@ class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
 
         assertThrows(ConflictException.class, () -> userService.userUpdate(1L, dto));
-        verify(userRepository, never()).save(any(User.class));
+        verify(userRepository, never()).saveAndFlush(any(User.class));
     }
 
     private User createUser() {

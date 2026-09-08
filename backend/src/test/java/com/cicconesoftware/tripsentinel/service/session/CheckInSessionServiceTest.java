@@ -217,7 +217,7 @@ class CheckInSessionServiceTest {
         when(mapper.toCheckInSessionEntity(dto))
                 .thenReturn(session);
 
-        when(repository.save(session))
+        when(repository.saveAndFlush(session))
                 .thenReturn(session);
 
         when(mapper.toCheckInSessionResponseDto(session))
@@ -242,7 +242,7 @@ class CheckInSessionServiceTest {
                 session.getStatus()
         );
 
-        verify(repository).save(session);
+        verify(repository).saveAndFlush(session);
     }
 
     @Test
@@ -284,7 +284,7 @@ class CheckInSessionServiceTest {
         when(mapper.toCheckInSessionEntity(dto))
                 .thenReturn(session);
 
-        when(repository.save(session))
+        when(repository.saveAndFlush(session))
                 .thenReturn(session);
 
         when(mapper.toCheckInSessionResponseDto(session))
@@ -311,7 +311,7 @@ class CheckInSessionServiceTest {
         assertEquals(Instant.parse("2026-09-10T06:00:00Z"), session.getStartAt());
         assertEquals("Europe/Oslo", session.getTimeZone());
 
-        verify(repository).save(session);
+        verify(repository).saveAndFlush(session);
     }
 
     @Test
@@ -437,7 +437,7 @@ class CheckInSessionServiceTest {
         when(repository.findById(1L))
                 .thenReturn(Optional.of(existingSession));
 
-        when(repository.save(existingSession))
+        when(repository.saveAndFlush(existingSession))
                 .thenReturn(existingSession);
 
         when(mapper.toCheckInSessionResponseDto(existingSession))
@@ -453,7 +453,7 @@ class CheckInSessionServiceTest {
         verify(mapper)
                 .updateCheckInSession(dto, existingSession);
 
-        verify(repository).save(existingSession);
+        verify(repository).saveAndFlush(existingSession);
     }
 
     @Test
@@ -483,7 +483,7 @@ class CheckInSessionServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.of(session));
         when(userRepository.findById(3L)).thenReturn(Optional.of(responder));
         when(checkInMethodRepository.findAllById(Set.of(10L))).thenReturn(List.of(method));
-        when(repository.save(session)).thenReturn(session);
+        when(repository.saveAndFlush(session)).thenReturn(session);
         when(mapper.toCheckInSessionResponseDto(session)).thenReturn(responseDto);
 
         CheckInSessionResponseDto result = service.updateCheckInSession(dto, 1L);
@@ -505,7 +505,7 @@ class CheckInSessionServiceTest {
         when(repository.findById(1L))
                 .thenReturn(Optional.of(session));
 
-        when(repository.save(session))
+        when(repository.saveAndFlush(session))
                 .thenReturn(session);
 
         when(mapper.toCheckInSessionResponseDto(session))
@@ -523,7 +523,7 @@ class CheckInSessionServiceTest {
                 session.getStatus()
         );
 
-        verify(repository).save(session);
+        verify(repository).saveAndFlush(session);
     }
 
     private Role role(RoleType roleType) {

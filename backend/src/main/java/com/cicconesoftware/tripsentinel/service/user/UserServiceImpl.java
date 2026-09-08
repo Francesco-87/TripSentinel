@@ -89,7 +89,7 @@ public UserResponseDto create(CreateUserRequestDto dto) {
     user.setRoles(Set.of(customerRole));
     user.setStatus(UserStatus.ACTIVE);
 
-    User savedUser = userRepository.save(user);
+    User savedUser = userRepository.saveAndFlush(user);
 
     return userMapper.toUserResponseDto(savedUser);
 }
@@ -110,7 +110,7 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
 
     user.setRoles(roles);
 
-    User savedUser = userRepository.save(user);
+    User savedUser = userRepository.saveAndFlush(user);
 
     return userMapper.toUserResponseDto(savedUser);
 }
@@ -141,7 +141,7 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
             existingUser.setRoles(roles);
         }
 
-        User savedUser = userRepository.save(existingUser);
+        User savedUser = userRepository.saveAndFlush(existingUser);
 
         return userMapper.toUserResponseDto(savedUser);
     }
@@ -162,7 +162,7 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
         validateAdministrativeChange(id, existingUser, dto.getStatus(), roles);
         userMapper.updateUserFromAdminDto(dto, existingUser);
         existingUser.setRoles(roles);
-        User savedUser = userRepository.save(existingUser);
+        User savedUser = userRepository.saveAndFlush(existingUser);
         return userMapper.toUserResponseDto(savedUser);
     }
 
@@ -181,7 +181,7 @@ public UserResponseDto adminCreate(AdminCreateUserRequestDto dto) {
         // TODO(email-verification): Keep the current email until the requested address is verified.
         userMapper.updateUserFromUserDto(dto, existingUser);
         
-        User savedUser = userRepository.save(existingUser);
+        User savedUser = userRepository.saveAndFlush(existingUser);
         return userMapper.toUserResponseDto(savedUser);
     }
 

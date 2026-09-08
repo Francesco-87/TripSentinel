@@ -157,7 +157,7 @@ class ResponderAvailabilityServiceTest {
         when(userRepository.findById(1L))
                 .thenReturn(Optional.of(responder));
 
-        when(repository.save(
+        when(repository.saveAndFlush(
                 org.mockito.ArgumentMatchers.any(
                         ResponderAvailability.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
@@ -175,7 +175,7 @@ class ResponderAvailabilityServiceTest {
         );
 
         verify(userRepository).findById(1L);
-        verify(repository).save(
+        verify(repository).saveAndFlush(
                 org.mockito.ArgumentMatchers.any(
                         ResponderAvailability.class));
     }
@@ -190,7 +190,7 @@ class ResponderAvailabilityServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(responder));
 
         assertThrows(BadRequestException.class, () -> service.create(1L, dto));
-        verify(repository, never()).save(any(ResponderAvailability.class));
+        verify(repository, never()).saveAndFlush(any(ResponderAvailability.class));
     }
 
     @Test
@@ -218,7 +218,7 @@ class ResponderAvailabilityServiceTest {
         when(repository.findById(1L))
                 .thenReturn(Optional.of(existing));
 
-        when(repository.save(existing))
+        when(repository.saveAndFlush(existing))
                 .thenReturn(existing);
 
         // Act
@@ -234,7 +234,7 @@ class ResponderAvailabilityServiceTest {
         );
 
         verify(repository).findById(1L);
-        verify(repository).save(existing);
+        verify(repository).saveAndFlush(existing);
     }
 
     @Test

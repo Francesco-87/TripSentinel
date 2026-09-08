@@ -98,7 +98,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
         availability.setAvailableUntil(availableUntil);
         availability.setTimeZone(timeZone.getId());
 
-        availability = repository.save(availability);
+        availability = repository.saveAndFlush(availability);
 
         return mapper.toResponderAvailabilityResponseDto(availability);
     }
@@ -122,7 +122,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
         availability.setAvailableUntil(availableUntil);
         availability.setTimeZone(timeZone.getId());
 
-        availability = repository.save(availability);
+        availability = repository.saveAndFlush(availability);
 
         return mapper.toResponderAvailabilityResponseDto(availability);
     }

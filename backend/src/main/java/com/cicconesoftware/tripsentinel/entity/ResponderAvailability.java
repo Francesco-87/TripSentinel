@@ -2,6 +2,9 @@ package com.cicconesoftware.tripsentinel.entity;
 
 import java.time.Instant;
 
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
+
 import com.cicconesoftware.tripsentinel.entity.enums.AvailabilityStatus;
 
 import jakarta.persistence.Column;
@@ -37,10 +40,12 @@ public class ResponderAvailability {
     @Column(name = "status", nullable = false, length = 30)
     private AvailabilityStatus status;
 
-    @Column(name = "created_at", insertable = false, updatable = false)
+    @Generated(event = EventType.INSERT)
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name = "updated_at", insertable = false, updatable = false)
+    @Generated(event = {EventType.INSERT, EventType.UPDATE})
+    @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
     private Instant updatedAt;
 
     public ResponderAvailability() {

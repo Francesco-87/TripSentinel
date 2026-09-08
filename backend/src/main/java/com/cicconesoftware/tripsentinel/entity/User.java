@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.hibernate.annotations.Generated;
+import org.hibernate.generator.EventType;
+
 import com.cicconesoftware.tripsentinel.entity.enums.UserStatus;
 
 import jakarta.persistence.Column;
@@ -47,10 +50,12 @@ public class User {
     @Column(name = "status", nullable = false)
     private UserStatus status;
 
-    @Column(name  = "created_at", nullable = false)
+    @Generated(event = EventType.INSERT)
+    @Column(name = "created_at", nullable = false, insertable = false, updatable = false)
     private Instant createdAt;
 
-    @Column(name  = "updated_at", nullable = false)
+    @Generated(event = {EventType.INSERT, EventType.UPDATE})
+    @Column(name = "updated_at", nullable = false, insertable = false, updatable = false)
     private Instant updatedAt;
 
 
