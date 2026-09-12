@@ -1,5 +1,7 @@
 package com.cicconesoftware.tripsentinel.dto.user;
 
+import com.cicconesoftware.tripsentinel.util.EmailNormalizer;
+
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -50,7 +52,7 @@ public class UserUpdateProfileRequestDto {
 
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = EmailNormalizer.normalize(email);
     }
 
 

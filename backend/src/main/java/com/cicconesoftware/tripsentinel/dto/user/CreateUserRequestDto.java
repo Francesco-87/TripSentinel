@@ -1,5 +1,7 @@
 package com.cicconesoftware.tripsentinel.dto.user;
 
+import com.cicconesoftware.tripsentinel.util.EmailNormalizer;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -45,7 +47,7 @@ public class CreateUserRequestDto {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = EmailNormalizer.normalize(email);
     }
 
     public String getPhoneNumber() {

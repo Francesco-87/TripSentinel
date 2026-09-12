@@ -1,5 +1,7 @@
 package com.cicconesoftware.tripsentinel.dto.user;
 
+import com.cicconesoftware.tripsentinel.util.EmailNormalizer;
+
 import java.util.Set;
 
 import com.cicconesoftware.tripsentinel.entity.enums.RoleType;
@@ -53,7 +55,7 @@ public class AdminCreateUserRequestDto {
         return email;
     }
     public void setEmail(String email) {
-        this.email = email;
+        this.email = EmailNormalizer.normalize(email);
     }
     public String getPhoneNumber() {
         return phoneNumber;

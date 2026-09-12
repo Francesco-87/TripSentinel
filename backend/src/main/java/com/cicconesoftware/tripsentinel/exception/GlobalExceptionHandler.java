@@ -3,6 +3,8 @@ package com.cicconesoftware.tripsentinel.exception;
 import java.time.OffsetDateTime;
 import java.util.stream.Collectors;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,6 +33,28 @@ public class GlobalExceptionHandler {
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String error, String message) {
         return ResponseEntity.status(status)
                 .body(new ErrorResponse(status.value(), error, message, OffsetDateTime.now()));
+    }
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        Throwable cause = ex;
+
+        while (cause != null) {
+            if (cause instanceof ConstraintViolationException constraintException) {
+                if ("email".equals(constraintException.getConstraintName())) {
+                    return buildResponse(
+                        HttpStatus.CONFLICT,
+                        "Conflict",
+                        "Email already in use"
+                    );
+                }
+            }
+            cause = cause.getCause();
+        }
+        return buildResponse(
+            HttpStatus.CONFLICT,
+            "Conflict",
+            "The operation violates a database constraint."
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

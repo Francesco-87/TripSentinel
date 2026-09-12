@@ -24,6 +24,7 @@ import com.cicconesoftware.tripsentinel.mapper.user.UserMapper;
 import com.cicconesoftware.tripsentinel.repository.RoleRepository;
 import com.cicconesoftware.tripsentinel.repository.CheckInSessionRepository;
 import com.cicconesoftware.tripsentinel.repository.UserRepository;
+import com.cicconesoftware.tripsentinel.util.EmailNormalizer;
 
 @Service
 @Transactional
@@ -61,7 +62,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto getByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+        String normalizedEmail = EmailNormalizer.normalize(email);
+        User user = userRepository.findByEmail(normalizedEmail).orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + normalizedEmail));
         return userMapper.toUserResponseDto(user);
     }
 
