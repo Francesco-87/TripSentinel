@@ -28,7 +28,7 @@ public class CreateCheckInSessionRequestDto {
     @NotBlank
     private String timeZone;
 
-    
+    @NotBlank
     private String locationDescription;
 
     private String importantNotes;

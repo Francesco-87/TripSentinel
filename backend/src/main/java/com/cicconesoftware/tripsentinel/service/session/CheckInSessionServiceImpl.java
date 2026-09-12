@@ -172,6 +172,10 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
         CheckInSession session = repository.findById(sessionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Check-in session not found with id: " + sessionId));
 
+        if (dto.getLocationDescription() != null && dto.getLocationDescription().isBlank()) {
+            throw new BadRequestException("Location description cannot be blank");
+        }
+
         if (dto.getResponderId() != null) {
             User responder = userRepository.findById(dto.getResponderId())
                     .orElseThrow(() -> new ResourceNotFoundException("Responder not found with id: " + dto.getResponderId()));
@@ -187,6 +191,7 @@ public class CheckInSessionServiceImpl implements CheckInSessionService {
             }
             session.setCheckInMethods(new HashSet<>(checkInMethods));
         }
+            
 
         ZoneId timeZone = parseTimeZone(dto.getTimeZone() != null ? dto.getTimeZone() : session.getTimeZone());
         if (dto.getStartAt() != null) {

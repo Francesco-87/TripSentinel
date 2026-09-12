@@ -31,7 +31,7 @@ public class AdminCreateCheckInSessionRequestDto {
     @NotBlank
     private String timeZone;
 
-    
+    @NotBlank
     private String locationDescription;
 
     private String importantNotes;

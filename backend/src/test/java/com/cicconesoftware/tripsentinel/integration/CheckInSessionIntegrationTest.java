@@ -12,8 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -388,6 +395,82 @@ void shouldReturnBadRequestForInvalidSessionRequest() throws Exception {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.timestamp").exists());
 }
+    static Stream<Arguments> invalidCreationLocations() {
+        return Stream.of(false, true).flatMap(admin ->
+                Stream.of("omitted", "null", "", "   ", "\t\n")
+                        .map(location -> Arguments.of(admin, location)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("invalidCreationLocations")
+    void shouldRejectInvalidLocationOnCreation(boolean admin, String location) throws Exception {
+        Long customerId = createCustomer("location.create.customer@test.com");
+        Long responderId = createResponder("location.create.responder@test.com");
+        Map<String, Object> request = new HashMap<>();
+        request.put("responderId", responderId);
+        request.put("checkInMethodIds", Set.of(getPhoneMethodId()));
+        request.put("startAt", "2026-09-15T08:00:00");
+        request.put("expectedReturnAt", "2026-09-15T12:00:00");
+        request.put("latestCheckInAt", "2026-09-15T13:00:00");
+        request.put("timeZone", "UTC");
+        if (!"omitted".equals(location)) {
+            request.put("locationDescription", "null".equals(location) ? null : location);
+        }
+        if (admin) {
+            request.put("customerId", customerId);
+        }
+        String endpoint = admin ? "/api/check-in-sessions/create-admin"
+                : "/api/check-in-sessions/create-user/" + customerId;
+
+        mockMvc.perform(post(endpoint)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("locationDescription: must not be blank"));
+
+        assertEquals(0, checkInSessionRepository.findByCustomerId(customerId).size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "   ", "\t\n"})
+    void shouldRejectBlankLocationOnPatch(String location) throws Exception {
+        Long customerId = createCustomer("location.patch.customer@test.com");
+        Long responderId = createResponder("location.patch.responder@test.com");
+        Long sessionId = createSession(customerId, responderId);
+
+        mockMvc.perform(patch("/api/check-in-sessions/{id}", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of("locationDescription", location))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Location description cannot be blank"));
+
+        mockMvc.perform(get("/api/check-in-sessions/{id}", sessionId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.locationDescription").value("Integration location"));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "{\"importantNotes\":\"Changed notes\"}",
+            "{\"importantNotes\":\"Changed notes\",\"locationDescription\":null}"
+    })
+    void shouldPreserveLocationWhenPatchOmitsItOrSuppliesNull(String request) throws Exception {
+        Long customerId = createCustomer("location.omitted.customer@test.com");
+        Long responderId = createResponder("location.omitted.responder@test.com");
+        Long sessionId = createSession(customerId, responderId);
+
+        mockMvc.perform(patch("/api/check-in-sessions/{id}", sessionId)
+                .contentType(MediaType.APPLICATION_JSON).content(request))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.locationDescription").value("Integration location"))
+                .andExpect(jsonPath("$.importantNotes").value("Changed notes"));
+
+        mockMvc.perform(get("/api/check-in-sessions/{id}", sessionId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.locationDescription").value("Integration location"))
+                .andExpect(jsonPath("$.importantNotes").value("Changed notes"));
+    }
+
     private Long createCustomer(String email) throws Exception {
 
         CreateUserRequestDto dto = new CreateUserRequestDto();
