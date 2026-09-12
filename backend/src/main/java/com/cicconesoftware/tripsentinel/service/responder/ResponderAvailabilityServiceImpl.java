@@ -8,6 +8,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.cicconesoftware.tripsentinel.dto.responder.CreateResponderAvailabilityRequestDto;
 import com.cicconesoftware.tripsentinel.dto.responder.ResponderAvailabilityResponseDto;
@@ -25,6 +26,7 @@ import com.cicconesoftware.tripsentinel.repository.UserRepository;
 
 
 @Service
+@Transactional
 /** Implements the responder availability application operations. */
 public class ResponderAvailabilityServiceImpl implements ResponderAvailabilityService {
 
@@ -40,6 +42,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ResponderAvailabilityResponseDto getById(Long id){
 
         ResponderAvailability availability = repository.findById(id)
@@ -50,6 +53,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<ResponderAvailabilityResponseDto> getByResponderId(Long responderId){
 
         List<ResponderAvailability> availabilities = repository.findByResponderId(responderId);
@@ -60,6 +64,7 @@ public class ResponderAvailabilityServiceImpl implements ResponderAvailabilitySe
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ResponderAvailabilityResponseDto> getAll(){
         
         return repository.findAll().stream()

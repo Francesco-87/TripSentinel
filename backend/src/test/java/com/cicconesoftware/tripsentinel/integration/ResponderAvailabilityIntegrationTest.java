@@ -13,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.cicconesoftware.tripsentinel.dto.responder.CreateResponderAvailabilityRequestDto;
 import com.cicconesoftware.tripsentinel.dto.responder.UpdateResponderAvailabilityRequestDto;
@@ -301,6 +304,53 @@ void shouldReturnBadRequestForInvalidAvailabilityRequest() throws Exception {
             .andExpect(jsonPath("$.message").exists())
             .andExpect(jsonPath("$.timestamp").exists());
 }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void shouldCreateAndUpdateAvailabilityWithoutTestTransaction() throws Exception {
+        assertFalse(TransactionSynchronizationManager.isActualTransactionActive());
+        Long responderId = createResponder("availability-" + UUID.randomUUID() + "@test.com");
+        try {
+            // Each request must use the service's transaction, not one supplied by the test.
+            var created = mockMvc.perform(post(
+                    "/api/responder-availability/responder/{responderId}", responderId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                            {"availableFrom":"2026-10-01T08:00:00",
+                             "availableUntil":"2026-10-01T16:00:00","timeZone":"UTC"}
+                            """))
+                    .andExpect(status().isCreated())
+                    .andExpect(jsonPath("$.createdAt").isNotEmpty())
+                    .andExpect(jsonPath("$.updatedAt").isNotEmpty())
+                    .andReturn();
+            long availabilityId = objectMapper.readTree(created.getResponse().getContentAsString())
+                    .get("id").asLong();
+
+            mockMvc.perform(put("/api/responder-availability/{id}", availabilityId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                            {"availableFrom":"2026-10-01T09:00:00",
+                             "availableUntil":"2026-10-01T17:00:00",
+                             "timeZone":"UTC","status":"UNAVAILABLE"}
+                            """))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.status").value("UNAVAILABLE"));
+
+            mockMvc.perform(get("/api/responder-availability/{id}", availabilityId))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.availableFrom").value("2026-10-01T09:00:00Z"))
+                    .andExpect(jsonPath("$.status").value("UNAVAILABLE"));
+
+            mockMvc.perform(delete("/api/responder-availability/{id}", availabilityId))
+                    .andExpect(status().isNoContent());
+            assertFalse(responderAvailabilityRepository.existsById(availabilityId));
+        } finally {
+            // These requests commit, so explicitly remove only this test's records.
+            responderAvailabilityRepository.deleteAll(
+                    responderAvailabilityRepository.findByResponderId(responderId));
+            userRepository.deleteById(responderId);
+        }
+    }
 
     private Long createResponder(String email) throws Exception {
 
