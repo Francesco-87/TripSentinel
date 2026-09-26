@@ -1,0 +1,103 @@
+:root {
+  --text: #172b4d;
+  --text-muted: #526173;
+  --text-h: #172b4d;
+  --bg: #ffffff;
+  --surface-alt: #f3f7f8;
+  --border: #c7d3d8;
+  --code-bg: #eaf1f3;
+
+  --accent: #005a70;
+  --accent-hover: #004052;
+  --accent-on: #ffffff;
+  --accent-bg: #e5f2f5;
+  --accent-border: #005a70;
+
+  --success: #146c43;
+  --warning: #a15c00;
+  --danger: #b42318;
+  --focus: #6b35c9;
+
+  --social-bg: #f3f7f8;
+  --shadow: rgba(23, 43, 77, 0.14) 0 10px 15px -3px,
+    rgba(23, 43, 77, 0.08) 0 4px 6px -2px;
+
+  --sans: 'Atkinson Hyperlegible', 'Segoe UI', sans-serif;
+  --heading: 'Atkinson Hyperlegible', 'Segoe UI', sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font: 18px/145% var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  margin: 0;
+  background: var(--surface-alt);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+a {
+  color: var(--accent-hover);
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+  color: var(--text-h);
+  font-family: var(--heading);
+}
+
+p {
+  margin-top: 0;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
