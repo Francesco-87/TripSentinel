@@ -1,0 +1,23 @@
+.footer {
+  padding: 1.5rem max(1.25rem, calc((100% - 1200px) / 2));
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+}
+
+.footer__content {
+  text-align: center;
+}
+
+.footer__content p {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 600px) {
+  .footer {
+    padding-block: 1.25rem;
+  }
+}
