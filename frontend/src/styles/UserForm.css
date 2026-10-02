@@ -1,0 +1,58 @@
+.user-form {
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.user-form h3 { margin-bottom: 1.5rem; font-size: 1.15rem; }
+.user-form__fields, .user-form__passwords {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+.user-form__fields > div, .user-form__passwords > div { min-width: 0; }
+.user-form__passwords, .user-form__actions { grid-column: 1 / -1; }
+.user-form label { display: block; margin-bottom: 0.4rem; font-size: 0.9rem; font-weight: 600; }
+.user-form input:not([type="checkbox"]) {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--bg);
+  color: var(--text);
+}
+.user-form input::placeholder { color: var(--text-muted); }
+.user-form input:hover { border-color: var(--accent); }
+.user-form__roles { grid-column: 1 / -1; min-width: 0; margin: 0; padding: 0; border: 0; }
+.user-form__roles legend { margin-bottom: 0.5rem; font-size: 0.9rem; font-weight: 600; }
+.user-form .user-form__role {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  margin: 0 0.75rem 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  cursor: pointer;
+}
+.user-form__role:has(input:checked) { background: var(--accent-bg); border-color: var(--accent); }
+.user-form__role input { width: 1.15rem; height: 1.15rem; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.user-form__actions { padding-top: 0.5rem; border-top: 1px solid var(--border); }
+.user-form button[type="submit"] {
+  min-height: 44px;
+  padding: 0.7rem 1.5rem;
+  border: 1px solid var(--accent);
+  border-radius: 0.5rem;
+  background: var(--accent);
+  color: var(--accent-on);
+  font-weight: 700;
+}
+.user-form button[type="submit"]:hover { background: var(--accent-hover); }
+.user-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@media (max-width: 600px) {
+  .user-form__fields, .user-form__passwords { grid-template-columns: 1fr; }
+  .user-form button[type="submit"] { width: 100%; }
+}

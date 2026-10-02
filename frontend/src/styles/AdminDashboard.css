@@ -1,0 +1,65 @@
+.admin-dashboard {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+}
+
+.admin-dashboard__heading { margin-bottom: 2rem; }
+.admin-dashboard__heading h1 { margin-bottom: 0.5rem; font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.2; }
+.admin-dashboard__heading p { color: var(--text-muted); }
+.admin-dashboard__section { margin-bottom: 2.5rem; min-width: 0; }
+.admin-dashboard__section > h2 { font-size: 1.3rem; margin-bottom: 1rem; }
+
+.admin-dashboard__stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.admin-dashboard__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent);
+  border-radius: 0.75rem;
+}
+.admin-dashboard__stat span { color: var(--text-muted); font-size: 0.9rem; }
+.admin-dashboard__stat strong { font-size: 2rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.admin-dashboard__message, .admin-dashboard__error { padding: 1rem; border-radius: 0.5rem; background: var(--bg); }
+.admin-dashboard__error { color: var(--danger); border: 1px solid var(--danger); }
+
+.admin-dashboard__table-scroll {
+  overflow-x: auto;
+  margin-top: 1.5rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.admin-dashboard table { width: 100%; border-collapse: collapse; font-size: 0.9rem; text-align: left; }
+.admin-dashboard th, .admin-dashboard td { padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.admin-dashboard th { background: var(--accent-bg); color: var(--accent-hover); white-space: nowrap; }
+.admin-dashboard td { overflow-wrap: anywhere; min-width: 6rem; }
+.admin-dashboard tbody tr:last-child td { border-bottom: 0; }
+.admin-dashboard tbody tr:hover { background: var(--surface-alt); }
+.admin-dashboard td button {
+  min-height: 44px;
+  padding: 0.4rem 1rem;
+  border: 1px solid var(--accent);
+  border-radius: 0.4rem;
+  background: var(--bg);
+  color: var(--accent);
+  font-weight: 600;
+}
+.admin-dashboard td button:hover { background: var(--accent-bg); }
+
+@media (max-width: 1000px) {
+  .admin-dashboard__stats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .admin-dashboard { padding: 2rem 1rem; }
+  .admin-dashboard__stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-dashboard__stat { padding: 1rem; }
+}
