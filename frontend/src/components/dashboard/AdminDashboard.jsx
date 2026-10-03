@@ -26,6 +26,7 @@ function AdminDashboard() {
     const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [statusError, setStatusError] = useState(null);
 
 
     const fetchUsers = useCallback(async () => {
@@ -68,6 +69,18 @@ function AdminDashboard() {
         await adminUpdateUser(selectedUser.id, userData)
         await fetchUsers()
         setSelectedUser(null)
+    }
+
+   async function handleStatusChange(userData) {
+        setStatusError(null);
+        const userStatus = userData.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
+
+        try {
+            await adminUpdateUser(userData.id, { status: userStatus });
+            await fetchUsers();
+        } catch (error) {
+            setStatusError(error.message || "Unable to change user status.");
+        }
     }
 
     const loadDashboard = useCallback(async () => {
@@ -114,7 +127,13 @@ function AdminDashboard() {
         </div>
         {loading && <p className="admin-dashboard__message" role="status">Loading...</p>}
         {error && <p className="admin-dashboard__error" role="alert">Error: {error.message}</p>}
+         {statusError && (
+                <p className="admin-dashboard__error" role="alert">
+                    {statusError}
+                </p>
+            )}
         {!loading && !error && (
+           
             <div className="admin-dashboard__table-scroll" role="region" aria-label="Users table" tabIndex={0}>
             <table>
                 <thead>
@@ -145,7 +164,14 @@ function AdminDashboard() {
                                 
                                 onClick={() => setSelectedUser(user)}
                                 >Edit</button>
-                                
+                            
+                    
+                                <button 
+                                type="button"
+                                onClick={() => handleStatusChange(user)}
+                                >
+                                    {user.status === "ACTIVE" ? "Deactivate" : "Activate"}
+                                </button>
                             </td>
                         </tr>
                     ))}
