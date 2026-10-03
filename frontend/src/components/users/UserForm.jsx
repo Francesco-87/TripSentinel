@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useId } from "react";
 import "../../styles/UserForm.css";
 
 
@@ -16,22 +16,10 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
     }
 
     const [formData, setFormData] = useState(initialData || emptyForm);
+    const [isSaving, setIsSaving] = useState(false);
+    const [submitError, setSubmitError] = useState(null);
+    const formId = useId();
 
-    useEffect(() => {
-        if (initialData) {
-            setFormData({
-                id: initialData.id,
-                firstName: initialData.firstName,
-                lastName: initialData.lastName,
-                email: initialData.email,
-                phoneNumber: initialData.phoneNumber,
-                roles: initialData.roles,
-                status: initialData.status,
-            })
-        }else {
-            setFormData(emptyForm);
-        }
-    }, [initialData]);
 
     function handleChange(e) { 
         const { name, value, type, checked } = e.target
@@ -53,6 +41,8 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
     // Handle form submission; calls parent callback and resets form if creating new user
     async function handleSubmit(e) {
         e.preventDefault()
+        if (isSaving) return;
+        setSubmitError(null);
         if (formData.roles.length === 0) {
             alert("Select at least one role")
             return
@@ -73,23 +63,30 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
             formDataToSubmit.password = formData.password
             formDataToSubmit.status = "ACTIVE"  // Set default status for new users
         }
-        // Call parent's onSubmit callback with form data
-        await onSubmit(formDataToSubmit)
-        // Reset form to empty state only when creating new user (not during updates)
-        if (!initialData) {
-        setFormData(emptyForm)
+        setIsSaving(true);
+        try {
+            await onSubmit(formDataToSubmit);
+            if (!initialData) {
+                setFormData(emptyForm);
+            }
+        } catch (error) {
+            setSubmitError(error.message || "Unable to save user. Please try again.");
+        } finally {
+            setIsSaving(false);
         }
     }
 
     return (
         <div className="user-form">
-            <h3>{title}</h3>
-            <form className="user-form__fields" onSubmit={handleSubmit}>
+            {title && <h3>{title}</h3>}
+            <form onSubmit={handleSubmit} aria-busy={isSaving}>
+                <fieldset className="user-form__fields user-form__controls" disabled={isSaving}>
+                <legend className="user-form__sr-only">User details</legend>
                 <div>
-                    <label htmlFor="firstName">First Name:</label>
+                    <label htmlFor={`${formId}-firstName`}>First Name:</label>
                     <input
                         type="text"
-                        id="firstName"
+                        id={`${formId}-firstName`}
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleChange}
@@ -99,10 +96,10 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
                     />
                 </div>
                 <div>
-                    <label htmlFor="lastName">Last Name:</label>
+                    <label htmlFor={`${formId}-lastName`}>Last Name:</label>
                     <input
                         type="text"
-                        id="lastName"
+                        id={`${formId}-lastName`}
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleChange}
@@ -112,10 +109,10 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
                     />
                 </div>
                 <div>
-                    <label htmlFor="email">Email:</label>
+                    <label htmlFor={`${formId}-email`}>Email:</label>
                     <input
                         type="email"
-                        id="email"
+                        id={`${formId}-email`}
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
@@ -124,10 +121,10 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
                     />
                 </div>
                 <div>
-                    <label htmlFor="phoneNumber">Phone Number:</label>
+                    <label htmlFor={`${formId}-phoneNumber`}>Phone Number:</label>
                     <input 
                         type="text"
-                        id="phoneNumber"
+                        id={`${formId}-phoneNumber`}
                         name="phoneNumber"
                         value={formData.phoneNumber}
                         onChange={handleChange}
@@ -139,10 +136,10 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
                     
                 <div className="user-form__passwords"> 
                      <div>
-                            <label htmlFor="password">Password:</label>
+                            <label htmlFor={`${formId}-password`}>Password:</label>
                             <input
                                 type="password"
-                                id="password"
+                                id={`${formId}-password`}
                                 name="password"
                                 value={formData.password}
                                 onChange={handleChange}
@@ -153,10 +150,10 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
                             />
                         </div>
                         <div>
-                            <label htmlFor="confirmPassword">Confirm Password:</label>
+                            <label htmlFor={`${formId}-confirmPassword`}>Confirm Password:</label>
                             <input 
                                 type="password"
-                                id="confirmPassword"
+                                id={`${formId}-confirmPassword`}
                                 name="confirmPassword"
                                 value={formData.confirmPassword}
                                 onChange={handleChange}
@@ -184,8 +181,10 @@ function UserForm({ onSubmit, initialData = null, submitLabel = "Create User", t
                     ))}
                 </fieldset>
                 <div className="user-form__actions"> 
-                    <button type="submit">{submitLabel}</button>
+                    {submitError && <p className="user-form__error" role="alert">{submitError}</p>}
+                    <button type="submit" disabled={isSaving}>{isSaving ? "Saving…" : submitLabel}</button>
                 </div>
+                </fieldset>
             </form>
         </div>
     );

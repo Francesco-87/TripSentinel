@@ -1,12 +1,14 @@
-import {useState} from 'react';
+import {useState, useCallback} from 'react';
 import {useEffect} from 'react';
 import {
     getUsers,
     adminCreateUser, 
+    adminUpdateUser,
 } from '../../services/userService.js';
 import {getCheckInSessions} from '../../services/checkInSessionsService.js';
 
 import UserForm from '../users/UserForm.jsx';
+import Modal from '../layout/Modal.jsx';
 import '../../styles/AdminDashboard.css';
 
 
@@ -21,43 +23,67 @@ function AdminDashboard() {
 
     });
     const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
 
-    
-
-
-    async function fetchStats() {
-            try {
+    const fetchUsers = useCallback(async () => {
+           try {
                 const users = await getUsers();
                 setUsers(users);
                 const activeUsers = users.filter(user => user.status === 'ACTIVE').length;
+                setStats(prev => ({ ...prev, activeUsers }));
+           } catch (error) {
+                console.error('Error fetching users:', error);
+                setError(error);
+           }
+    }, []);
+
+
+    const fetchSessionStats = useCallback(async () => {
+            try {               
+                
                 const checkInSessions = await getCheckInSessions();
                 const plannedCheckInSessions = checkInSessions.filter(session => session.status === 'PLANNED').length;
                 const activeCheckInSessions = checkInSessions.filter(session => session.status === 'ACTIVE').length;
                 const missedCheckInSessions = checkInSessions.filter(session => session.status === 'MISSED').length;
 
 
-                setStats({ activeUsers, totalCheckInSessions: checkInSessions.length, plannedCheckInSessions, activeCheckInSessions, missedCheckInSessions });
+                setStats(prev => ({ ...prev, totalCheckInSessions: checkInSessions.length, plannedCheckInSessions, activeCheckInSessions, missedCheckInSessions }));
             } catch (error) {
                 console.error('Error fetching stats:', error);
                 setError(error);
-            } finally {
-                setLoading(false);
-            }
-        }
+            } 
+        }, []);
      // Create a new user and refresh the list
     async function handleUserCreate(userData) {
         await adminCreateUser(userData)
-        await fetchStats()
+        await fetchUsers()
+        
     }
 
-    useEffect(() => {        
+     // Update an existing user and close the edit modal
+    async function handleUserUpdate(userData) {
+        await adminUpdateUser(selectedUser.id, userData)
+        await fetchUsers()
+        setSelectedUser(null)
+    }
 
-        fetchStats();
+    const loadDashboard = useCallback(async () => {
+        try{
+            setLoading(true);
+            setError(null);
+            await Promise.all([fetchUsers(), fetchSessionStats()]);
+        } finally {
+            setLoading(false);
+        }
+    }, [fetchUsers, fetchSessionStats]);
+
+    useEffect(() => {        
+        loadDashboard();
      
-    }, []);
+    }, [loadDashboard]);
 
   return (
     <main className="admin-dashboard">
@@ -114,7 +140,11 @@ function AdminDashboard() {
                             <td>{user.roles.join(', ')}</td>
                             <td>{user.status}</td>
                             <td>
-                                <button onClick={() => handleEditUser(user)}>Edit</button>
+                                <button 
+                                type="button"
+                                
+                                onClick={() => setSelectedUser(user)}
+                                >Edit</button>
                                 
                             </td>
                         </tr>
@@ -123,6 +153,24 @@ function AdminDashboard() {
             </table>
             </div>
         )}
+           {/* Edit user modal */}
+            {selectedUser && (
+                <Modal title="Edit User" onClose={() => setSelectedUser(null)}>
+                    <div
+                    
+                    onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Reuse the same form component for user updates */}
+                    <UserForm
+                    key={selectedUser.id}  // Ensure the form resets when a different user is selected
+                    onSubmit={handleUserUpdate}
+                    initialData={selectedUser}
+                    submitLabel="Update User"
+                    title={null}
+                    />
+                </div>
+                </Modal>
+            )}
     </section>
 
     </main>
