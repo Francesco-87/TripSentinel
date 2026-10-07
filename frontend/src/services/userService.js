@@ -14,6 +14,21 @@ async function getUsers() {
     }
 }
 
+async function getUserById(userId) {
+    try {
+        const response = await fetch(`http://localhost:8080/api/users/${userId}`);
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
+        const user = await response.json();
+        return user;
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        throw error;
+    }
+}
+
 async function adminCreateUser(userData) {
     try {
         const response = await fetch('http://localhost:8080/api/users/admin/create', {
@@ -56,4 +71,4 @@ async function adminUpdateUser(userId, userData) {
     }
 }
 
-export { getUsers, adminCreateUser, adminUpdateUser };
+export { getUsers, adminCreateUser, adminUpdateUser, getUserById };

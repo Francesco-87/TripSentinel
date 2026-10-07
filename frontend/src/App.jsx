@@ -4,10 +4,12 @@ import DashboardPage from './pages/DashboardPage'
 
 import './styles/App.css'
 
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import PublicLayout from './components/layout/PublicLayout'
 import DashboardLayout from './components/layout/DashboardLayout'
 import AdminDashboard from './components/dashboard/AdminDashboard'
+import AdminUsers from './components/users/AdminUsers'
+import AdminSessions from './components/sessions/AdminSessions'
 import ResponderDashboard from './components/dashboard/ResponderDashboard'
 import CustomerDashboard from './components/dashboard/CustomerDashboard'
 
@@ -25,7 +27,13 @@ function App() {
     </Route>
     <Route element={<DashboardLayout />}>
       <Route path="/dashboard" element={<DashboardPage />} />
-      <Route path="/admin" element={<AdminDashboard />} />
+
+      <Route path="/admin" element={<AdminDashboard />} >
+        <Route index element={<Navigate to="users" replace />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="sessions" element={<AdminSessions />} />
+      </Route>
+        
       <Route path="/responder" element={<ResponderDashboard />} />
       <Route path="/customer" element={<CustomerDashboard />} />
     </Route>

@@ -1,15 +1,9 @@
-import {useState, useCallback} from 'react';
-import {useEffect} from 'react';
-import {
-    getUsers,
-    adminCreateUser, 
-    adminUpdateUser,
-} from '../../services/userService.js';
+import { useState, useCallback, useEffect } from 'react';
+import { getUsers } from '../../services/userService.js';
 import {getCheckInSessions} from '../../services/checkInSessionsService.js';
 
-import UserForm from '../users/UserForm.jsx';
-import Modal from '../layout/Modal.jsx';
 import '../../styles/AdminDashboard.css';
+import { Outlet, NavLink } from 'react-router-dom';
 
 
 function AdminDashboard() {
@@ -23,17 +17,19 @@ function AdminDashboard() {
 
     });
     const [users, setUsers] = useState([]);
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [sessions, setSessions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [statusError, setStatusError] = useState(null);
 
 
+
+    // Stable callbacks keep the loading effect from repeating on every render.
     const fetchUsers = useCallback(async () => {
            try {
                 const users = await getUsers();
                 setUsers(users);
                 const activeUsers = users.filter(user => user.status === 'ACTIVE').length;
+                // Preserve session counts when refreshing only the users.
                 setStats(prev => ({ ...prev, activeUsers }));
            } catch (error) {
                 console.error('Error fetching users:', error);
@@ -42,60 +38,35 @@ function AdminDashboard() {
     }, []);
 
 
-    const fetchSessionStats = useCallback(async () => {
-            try {               
-                
-                const checkInSessions = await getCheckInSessions();
-                const plannedCheckInSessions = checkInSessions.filter(session => session.status === 'PLANNED').length;
-                const activeCheckInSessions = checkInSessions.filter(session => session.status === 'ACTIVE').length;
-                const missedCheckInSessions = checkInSessions.filter(session => session.status === 'MISSED').length;
+    const fetchSessions = useCallback(async () => {
+            try {
+                const sessionStats = await getCheckInSessions();
+                setSessions(sessionStats);
+                const plannedCheckInSessions = sessionStats.filter(session => session.status === 'PLANNED').length;
+                const activeCheckInSessions = sessionStats.filter(session => session.status === 'ACTIVE').length;
+                const missedCheckInSessions = sessionStats.filter(session => session.status === 'MISSED').length;
 
-
-                setStats(prev => ({ ...prev, totalCheckInSessions: checkInSessions.length, plannedCheckInSessions, activeCheckInSessions, missedCheckInSessions }));
+               
+                setStats(prev => ({ ...prev, totalCheckInSessions: sessionStats.length, plannedCheckInSessions, activeCheckInSessions, missedCheckInSessions }));
             } catch (error) {
                 console.error('Error fetching stats:', error);
                 setError(error);
-            } 
+            }
         }, []);
-     // Create a new user and refresh the list
-    async function handleUserCreate(userData) {
-        await adminCreateUser(userData)
-        await fetchUsers()
-        
-    }
-
-     // Update an existing user and close the edit modal
-    async function handleUserUpdate(userData) {
-        await adminUpdateUser(selectedUser.id, userData)
-        await fetchUsers()
-        setSelectedUser(null)
-    }
-
-   async function handleStatusChange(userData) {
-        setStatusError(null);
-        const userStatus = userData.status === "ACTIVE" ? "INACTIVE" : "ACTIVE";
-
-        try {
-            await adminUpdateUser(userData.id, { status: userStatus });
-            await fetchUsers();
-        } catch (error) {
-            setStatusError(error.message || "Unable to change user status.");
-        }
-    }
-
+    // Wait for both independent requests before showing the dashboard.
     const loadDashboard = useCallback(async () => {
         try{
             setLoading(true);
             setError(null);
-            await Promise.all([fetchUsers(), fetchSessionStats()]);
+            await Promise.all([fetchUsers(), fetchSessions()]);
         } finally {
             setLoading(false);
         }
-    }, [fetchUsers, fetchSessionStats]);
+    }, [fetchUsers, fetchSessions]);
 
-    useEffect(() => {        
+    useEffect(() => {
         loadDashboard();
-     
+
     }, [loadDashboard]);
 
   return (
@@ -104,6 +75,7 @@ function AdminDashboard() {
       <h1>Admin Dashboard</h1>
       <p>Welcome to the admin dashboard!</p>
     </div>
+
 
     <section className="admin-dashboard__section">
         <h2>Statistics</h2>
@@ -119,85 +91,15 @@ function AdminDashboard() {
             </div>
         )}
     </section>
-
     <section className="admin-dashboard__section">
-        <h2>Users</h2>
-        <div>
-            <UserForm onSubmit={handleUserCreate} title="Create new user" />
-        </div>
-        {loading && <p className="admin-dashboard__message" role="status">Loading...</p>}
-        {error && <p className="admin-dashboard__error" role="alert">Error: {error.message}</p>}
-         {statusError && (
-                <p className="admin-dashboard__error" role="alert">
-                    {statusError}
-                </p>
-            )}
-        {!loading && !error && (
-           
-            <div className="admin-dashboard__table-scroll" role="region" aria-label="Users table" tabIndex={0}>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">User ID</th>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Phone</th>
-                        <th scope="col">Roles</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map(user => (
-                        <tr key={user.id}>
-                            <td>{user.id}</td>
-                            <td>{user.firstName}</td>
-                            <td>{user.lastName}</td>
-                            <td>{user.email}</td>
-                            <td>{user.phoneNumber}</td>
-                            <td>{user.roles.join(', ')}</td>
-                            <td>{user.status}</td>
-                            <td>
-                                <button 
-                                type="button"
-                                
-                                onClick={() => setSelectedUser(user)}
-                                >Edit</button>
-                            
-                    
-                                <button 
-                                type="button"
-                                onClick={() => handleStatusChange(user)}
-                                >
-                                    {user.status === "ACTIVE" ? "Deactivate" : "Activate"}
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            </div>
-        )}
-           {/* Edit user modal */}
-            {selectedUser && (
-                <Modal title="Edit User" onClose={() => setSelectedUser(null)}>
-                    <div
-                    
-                    onClick={(e) => e.stopPropagation()}
-                >
-                  {/* Reuse the same form component for user updates */}
-                    <UserForm
-                    key={selectedUser.id}  // Ensure the form resets when a different user is selected
-                    onSubmit={handleUserUpdate}
-                    initialData={selectedUser}
-                    submitLabel="Update User"
-                    title={null}
-                    />
-                </div>
-                </Modal>
-            )}
+        <nav className="admin-dashboard__nav" aria-label="Admin dashboard navigation">
+            <NavLink to="/admin/users" className="admin-dashboard__nav-link">Users</NavLink>
+            <NavLink to="/admin/sessions" className="admin-dashboard__nav-link">Sessions</NavLink>
+        </nav>
+        {/* Share one user list between the overview and nested management views. */}
+        <Outlet context={{ users, fetchUsers, fetchSessions,sessions, loading, error }} />
     </section>
+
 
     </main>
   );
