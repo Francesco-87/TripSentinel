@@ -13,4 +13,40 @@ async function getCheckInSessions() {
         }
     }
 
-export { getCheckInSessions };
+async function adminCreateCheckInSession(sessionData) {
+    try {
+        const response = await fetch('http://localhost:8080/api/check-in-sessions/create-admin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sessionData)
+        });
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error creating check-in session:', error);
+        throw error;
+    }
+}
+
+async function getCheckInMethods() {
+    try {
+        const response = await fetch('http://localhost:8080/api/check-in-methods');
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching check-in methods:', error);
+        throw error;
+    }
+}
+
+export { getCheckInSessions, adminCreateCheckInSession, getCheckInMethods };
