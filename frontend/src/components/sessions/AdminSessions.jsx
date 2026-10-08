@@ -1,9 +1,28 @@
 import {useState} from "react";
 import { useOutletContext } from 'react-router-dom';
+import SessionForm from "./SessionForm.jsx";
+import {adminCreateCheckInSession, adminUpdateSession} from "../../services/checkInSessionsService.js";
+import Modal from "../layout/Modal.jsx";
+import "../../styles/AdminSessions.css";
 
 
 
 
+
+// Display backend UTC timestamps in the session's timezone, not the browser's timezone.
+function formatSessionTime(timestamp, timeZone) {
+    if (!timestamp) return "—";
+
+    return new Intl.DateTimeFormat("en-GB", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+    }).format(new Date(timestamp));
+}
 
 function AdminSessions() {
 
@@ -13,14 +32,27 @@ function AdminSessions() {
     const [statusError, setStatusError] = useState(null);
     const [userSearchTerm, setUserSearchTerm] = useState("");
 
+    // Create a new session and refresh the list
+    async function handleSessionCreate(sessionData) {
+        await adminCreateCheckInSession(sessionData)
+        await fetchSessions()
+    }
+
+    // Update an existing session and close the edit modal
+    async function handleSessionUpdate(sessionData) {
+        await adminUpdateSession(selectedSession.id, sessionData)
+        await fetchSessions()
+        setSelectedSession(null)
+    }
+
 
   return (
-    <section className="admin-dashboard__section">
-      <h2>Admin Sessions</h2>
+    <section className="admin-dashboard__section admin-sessions">
+      <h2>Sessions</h2>
       <div>
-        <p>This is for the creation and management of sessions.</p>
+        <SessionForm onSubmit={handleSessionCreate} title="Create new Session" />
       </div>
-      <div>
+      <div className="admin-sessions__search">
             <input type="search"
             placeholder="Search sessions..."
             aria-label="Search sessions"
@@ -64,9 +96,9 @@ function AdminSessions() {
                   <td>{session.customerId}</td>
                   <td>{session.responderId}</td>
                   <td>{session.locationDescription}</td>
-                  <td>{session.startAt}</td>
-                  <td>{session.expectedReturnAt}</td>
-                  <td>{session.latestCheckInAt}</td>
+                  <td>{formatSessionTime(session.startAt, session.timeZone)}</td>
+                  <td>{formatSessionTime(session.expectedReturnAt, session.timeZone)}</td>
+                  <td>{formatSessionTime(session.latestCheckInAt, session.timeZone)}</td>
                   <td>{session.timeZone}</td>
                   <td>{session.status}</td>
                   <td>
@@ -77,6 +109,22 @@ function AdminSessions() {
             </tbody>
           </table>
         </div>
+        )}
+        {/*Edit session modal*/}
+        {selectedSession && (
+            <Modal title="Edit Session" onClose={() => setSelectedSession(null)}>
+              <div onClick={(e) => e.stopPropagation()}>
+                <SessionForm
+                  key={selectedSession.id}
+                  onSubmit={handleSessionUpdate}
+                  initialData={selectedSession}
+                  submitLabel="Update Session"
+                  title={null}
+                />            
+                
+              </div>
+                
+            </Modal>
         )}
 
     </section>

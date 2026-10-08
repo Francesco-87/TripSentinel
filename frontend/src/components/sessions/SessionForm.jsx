@@ -1,4 +1,5 @@
 import {useState, useId, useEffect, useCallback} from "react";
+import "../../styles/SessionForm.css";
 import {getCheckInMethods} from "../../services/checkInSessionsService.js";
 
 
@@ -16,14 +17,53 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
     importantNotes: "",
 };
 
-    const [formData, setFormData] = useState(initialData || emptyForm);
+    const [formData, setFormData] = useState(buildInitialFormData(initialData) || emptyForm);
     const [isSaving, setIsSaving] = useState(false);
     const [submitError, setSubmitError] = useState(null);
     const [checkInMethods, setCheckInMethods] = useState([]);
     const [methodsLoading, setMethodsLoading] = useState(true);
     const [methodsError, setMethodsError] = useState(null);
     const formId = useId();
-    
+
+
+    //HELPER METHODS 
+    // For the formdata
+    function buildInitialFormData(initialData) {
+        if (!initialData) return emptyForm;
+        return {
+            customerId: initialData.customerId,
+            responderId: initialData.responderId,
+            checkInMethodIds: initialData.checkInMethods.map(method => method.id),
+            locationDescription: initialData.locationDescription,
+            startAt: toLocalDateTimeInput(initialData.startAt, initialData.timeZone),
+            expectedReturnAt: toLocalDateTimeInput(initialData.expectedReturnAt, initialData.timeZone),
+            latestCheckInAt: toLocalDateTimeInput(initialData.latestCheckInAt, initialData.timeZone),
+            timeZone: initialData.timeZone,
+            importantNotes: initialData.importantNotes ?? "",
+        }
+    }
+    //For timezone, convert to local time
+   function toLocalDateTimeInput(timestamp, timeZone) {
+    if (!timestamp) return "";
+
+    const formatter = new Intl.DateTimeFormat("en-GB", {
+        timeZone,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
+    });
+
+    const parts = formatter.formatToParts(new Date(timestamp));
+
+    const getPart = (type) =>
+        parts.find((part) => part.type === type).value;
+
+    return `${getPart("year")}-${getPart("month")}-${getPart("day")}T${getPart("hour")}:${getPart("minute")}`;
+}
+
     // Keep this reusable for retries without changing the effect dependency each render.
     const fetchCheckInMethods = useCallback(() => {
         return getCheckInMethods().then(
@@ -37,7 +77,7 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
                 setMethodsLoading(false);
             }
         );
-    }, []);
+    }, [setCheckInMethods, setMethodsLoading, setMethodsError]);
 
     function retryCheckInMethods() {
         setMethodsLoading(true);
@@ -78,8 +118,22 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
             return
         }
         setIsSaving(true);
+
+        const formDataToSubmit = {
+            ...(!initialData && { customerId: formData.customerId }),  // Only include customerId if creating a new session 
+            responderId: formData.responderId,
+            checkInMethodIds: formData.checkInMethodIds,
+            locationDescription: formData.locationDescription, 
+            ...((!initialData ||
+                    formData.startAt !== toLocalDateTimeInput(initialData.startAt, initialData.timeZone)) 
+                    && { startAt: formData.startAt }), 
+            expectedReturnAt: formData.expectedReturnAt,
+            latestCheckInAt: formData.latestCheckInAt,
+            timeZone: formData.timeZone,
+            importantNotes: formData.importantNotes,
+        };
         try {
-            await onSubmit(formData);
+            await onSubmit(formDataToSubmit);
             if (!initialData) {
                 setFormData(emptyForm);
             }
@@ -91,14 +145,16 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
     }
 
     return (
-        <div>
+        <div className="session-form">
             {title && <h3>{title}</h3>}
             <form onSubmit={handleSubmit} aria-busy={isSaving}>
-                <fieldset disabled={isSaving}>
-                <legend>Session details </legend>
+                <fieldset className="session-form__fields" disabled={isSaving}>
+                <legend className="session-form__legend">Session details</legend>
+                
                 <div>
                     <label htmlFor={`${formId}-customerId`}>Customer ID:</label>
                     <input 
+                        readOnly={Boolean(initialData)}
                         type="number"
                         min="1"
                         step="1"
@@ -194,7 +250,7 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
                         rows={4}
                     />
                 </div>
-                <fieldset >
+                <fieldset className="session-form__methods">
                     <legend >Check-In Methods (choose at least one):</legend>
                     {methodsLoading && <p role="status">Loading check-in methods…</p>}
                     {methodsError && (
@@ -207,7 +263,7 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
                         <p role="status">No check-in methods are available.</p>
                     )}
                     {checkInMethods.map((method) => (
-                        <div key={method.id}>
+                        <div className="session-form__method" key={method.id}>
                             <input
                                 type="checkbox"
                                 id={`${formId}-checkInMethod-${method.id}`}
@@ -223,7 +279,7 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
                 </fieldset>
 
             
-                <div>
+                <div className="session-form__actions">
                     {submitError && <p role="alert">{submitError}</p>}
                     <button type="submit" disabled={isSaving || methodsLoading || Boolean(methodsError) || checkInMethods.length === 0}>
                         {isSaving ? "Saving..." : submitLabel}

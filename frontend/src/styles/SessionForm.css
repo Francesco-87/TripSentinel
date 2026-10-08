@@ -1,0 +1,66 @@
+.session-form {
+  padding: clamp(1rem, 3vw, 2rem);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+}
+.session-form h3 { font-size: 1.15rem; margin-bottom: 1.5rem; }
+.session-form__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+}
+.session-form__legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.session-form__fields > div { min-width: 0; }
+.session-form label { display: block; margin-bottom: 0.4rem; font-size: 0.9rem; font-weight: 600; }
+.session-form input:not([type="checkbox"]), .session-form textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  background: var(--bg);
+  color: var(--text);
+}
+.session-form textarea { resize: vertical; }
+.session-form input::placeholder { color: var(--text-muted); }
+.session-form input:hover, .session-form textarea:hover { border-color: var(--accent); }
+.session-form__methods, .session-form__actions { grid-column: 1 / -1; }
+.session-form__methods { min-width: 0; padding: 0; margin: 0; border: 0; }
+.session-form__methods legend { margin-bottom: 0.6rem; font-size: 0.9rem; font-weight: 600; }
+.session-form__method {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  margin: 0 0.75rem 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+}
+.session-form__method:has(input:checked) { background: var(--accent-bg); border-color: var(--accent); }
+.session-form__method label { margin: 0; cursor: pointer; }
+.session-form__method input { width: 1.15rem; height: 1.15rem; margin: 0; accent-color: var(--accent); }
+.session-form__actions { border-top: 1px solid var(--border); padding-top: 1rem; }
+.session-form [role="alert"] { color: var(--danger); }
+.session-form [role="status"] { color: var(--text-muted); }
+.session-form button {
+  min-height: 44px;
+  padding: 0.7rem 1.25rem;
+  background: var(--accent);
+  color: var(--accent-on);
+  border: 1px solid var(--accent);
+  border-radius: 0.5rem;
+  font-weight: 600;
+}
+.session-form button:hover { background: var(--accent-hover); }
+.session-form button:disabled { opacity: 0.6; cursor: not-allowed; }
+.modal__body .session-form { padding: 0; border: 0; }
+@media (max-width: 600px) {
+  .session-form__fields { grid-template-columns: 1fr; }
+  .session-form__actions button { width: 100%; }
+}
