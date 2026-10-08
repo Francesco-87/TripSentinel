@@ -26,11 +26,10 @@ function formatSessionTime(timestamp, timeZone) {
 
 function AdminSessions() {
 
-// The parent owns users so table updates also refresh the overview count.
-    const { users, fetchUsers, sessions, fetchSessions, loading, error } = useOutletContext();
+    // The parent owns sessions so list updates also refresh the overview counts.
+    const { sessions, fetchSessions, loading, error } = useOutletContext();
     const [selectedSession, setSelectedSession] = useState(null);
-    const [statusError, setStatusError] = useState(null);
-    const [userSearchTerm, setUserSearchTerm] = useState("");
+    const [sessionSearchTerm, setSessionSearchTerm] = useState("");
 
     // Create a new session and refresh the list
     async function handleSessionCreate(sessionData) {
@@ -45,6 +44,19 @@ function AdminSessions() {
         setSelectedSession(null)
     }
 
+    function searchSessions(sessionSearchTerm) {
+        const searchTerm = sessionSearchTerm.trim().toLowerCase();
+
+        if (!searchTerm) return sessions;
+
+        return sessions.filter(session => {
+              return session.id.toString() === searchTerm || 
+              session.customerId.toString() === searchTerm || 
+              session.responderId.toString() === searchTerm;
+        });
+      }
+
+      const filteredSessions = searchSessions(sessionSearchTerm)
 
   return (
     <section className="admin-dashboard__section admin-sessions">
@@ -56,16 +68,13 @@ function AdminSessions() {
             <input type="search"
             placeholder="Search sessions..."
             aria-label="Search sessions"
+            value={sessionSearchTerm}
+            onChange={(e) => setSessionSearchTerm(e.target.value)}
              />
         </div>
 
         {loading && <p className="admin-dashboard__message" role="status">Loading...</p>}
         {error && <p className="admin-dashboard__error" role="alert">Error: {error.message}</p>}
-         {statusError && (
-                <p className="admin-dashboard__error" role="alert">
-                    {statusError}
-                </p>
-            )}
         {!loading && !error && (
 
         <div className="admin-dashboard__table-scroll" role="region" aria-label="Sessions table" tabIndex={0}>
@@ -85,12 +94,12 @@ function AdminSessions() {
               </tr>
             </thead>
             <tbody>
-              {sessions.length === 0 && (
+              {filteredSessions.length === 0 && (
                 <tr>
                   <td colSpan={10}>No sessions found.</td>
                 </tr>
               )}
-              {sessions.map(session => (
+              {filteredSessions.map(session => (
                 <tr key={session.id}>
                   <td>{session.id}</td>
                   <td>{session.customerId}</td>
