@@ -37,6 +37,13 @@
   color: var(--accent-hover);
 }
 
+.admin-dashboard__nav-link:disabled {
+  background: transparent;
+  color: var(--text-muted);
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 /* NavLink supplies aria-current for the route being displayed. */
 .admin-dashboard__nav-link[aria-current="page"] {
   background: var(--accent);

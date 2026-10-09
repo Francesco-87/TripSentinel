@@ -95,6 +95,7 @@ function AdminDashboard() {
         <nav className="admin-dashboard__nav" aria-label="Admin dashboard navigation">
             <NavLink to="/admin/users" className="admin-dashboard__nav-link">Users</NavLink>
             <NavLink to="/admin/sessions" className="admin-dashboard__nav-link">Sessions</NavLink>
+            <button type="button" className="admin-dashboard__nav-link" disabled>Availability</button>
         </nav>
         {/* Share one user list between the overview and nested management views. */}
         <Outlet context={{ users, fetchUsers, fetchSessions,sessions, loading, error }} />

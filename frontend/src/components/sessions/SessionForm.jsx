@@ -230,15 +230,25 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
                 </div>
                 <div>
                     <label htmlFor={`${formId}-timeZone`}>Time Zone:</label>
+                    {initialData ? (
                     <input
                         type="text"
                         id={`${formId}-timeZone`}
                         name="timeZone"
                         value={formData.timeZone}
-                        onChange={handleChange}
-                        placeholder="Europe/Oslo"
-                        required
+                        readOnly
                     />
+                    ) : (
+                    <select
+                        id={`${formId}-timeZone`}
+                        name="timeZone"
+                        value={formData.timeZone}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value="Europe/Oslo">Europe/Oslo</option>
+                    </select>
+                    )}
                 </div>
                 <div>
                     <label htmlFor={`${formId}-importantNotes`}>Important Notes (optional):</label>

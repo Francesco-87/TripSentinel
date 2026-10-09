@@ -32,6 +32,7 @@ function AdminSessions() {
     const [sessionSearchTerm, setSessionSearchTerm] = useState("");
     const [sessionCancel, setSessionCancel] = useState(null);
     const [cancelError, setCancelError] = useState("");
+    const [isCancelling, setIsCancelling] = useState(false);
 
     // Create a new session and refresh the list
     async function handleSessionCreate(sessionData) {
@@ -76,6 +77,8 @@ function AdminSessions() {
     const filteredSessions = searchSessions(sessionSearchTerm);
 
   async  function cancelSessionHandler(){
+    if (isCancelling || !sessionCancel) return;
+    setIsCancelling(true);
     setCancelError("");
     try{
        await cancelSession(sessionCancel.id);
@@ -83,6 +86,8 @@ function AdminSessions() {
        setSessionCancel(null);
     }catch (error) {
             setCancelError(error.message || "Unable to cancel session. Please try again.");
+    } finally {
+      setIsCancelling(false);
     }
     
       
@@ -155,10 +160,12 @@ function AdminSessions() {
                   <td>{session.status}</td>
                   <td>
                     <button onClick={() => setSelectedSession(session)}>Edit</button>
-                    <button onClick={() => {
+                    {session.status !== "CANCELLED" && (
+                    <button className="admin-sessions__cancel-button" onClick={() => {
                       setCancelError("");
                       setSessionCancel(session);
                     }}>Cancel</button>
+                    )}
                   </td>
                 </tr>
                 );
@@ -184,14 +191,24 @@ function AdminSessions() {
         )}
          {/*Cancel session modal*/}
          {sessionCancel && (
-          <Modal title="Cancel Session" onClose={() => setSessionCancel(null)}>
-              <div onClick={(e) => e.stopPropagation()}>
+          <Modal title="Cancel Session" onClose={(event) => {
+            if (isCancelling) {
+              event?.preventDefault();
+              return;
+            }
+            setSessionCancel(null);
+          }}>
+              <div className="admin-sessions__confirmation" aria-busy={isCancelling} onClick={(e) => e.stopPropagation()}>
                 <p>Are you sure you want to cancel the Session corresponding to ID-number: {sessionCancel.id}</p>
                 {cancelError && (
                   <p className="admin-dashboard__error" role="alert">{cancelError}</p>
                 )}
-                <button onClick={() => setSessionCancel(null)}>Keep Session</button>
-                <button onClick={cancelSessionHandler}>Confirm</button>
+                <div className="admin-sessions__confirmation-actions">
+                  <button disabled={isCancelling} onClick={() => setSessionCancel(null)}>Keep Session</button>
+                  <button className="admin-sessions__cancel-button" disabled={isCancelling} onClick={cancelSessionHandler}>
+                    {isCancelling ? "Cancelling..." : "Confirm cancellation"}
+                  </button>
+                </div>
               </div>
 
           </Modal>
