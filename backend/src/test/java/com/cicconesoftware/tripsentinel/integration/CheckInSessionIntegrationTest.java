@@ -2,7 +2,6 @@ package com.cicconesoftware.tripsentinel.integration;
 
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -276,7 +275,7 @@ class CheckInSessionIntegrationTest {
 
         Long sessionId = createSession(customerId, responderId);
 
-        mockMvc.perform(delete("/api/check-in-sessions/{sessionId}", sessionId))
+        mockMvc.perform(post("/api/check-in-sessions/{sessionId}/cancel", sessionId))
                 .andExpect(status().isNoContent());
 
         CheckInSession savedSession =

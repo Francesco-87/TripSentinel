@@ -1,7 +1,7 @@
 import {useState} from "react";
 import { useOutletContext } from 'react-router-dom';
 import SessionForm from "./SessionForm.jsx";
-import {adminCreateCheckInSession, adminUpdateSession} from "../../services/checkInSessionsService.js";
+import {adminCreateCheckInSession, adminUpdateSession, cancelSession} from "../../services/checkInSessionsService.js";
 import Modal from "../layout/Modal.jsx";
 import "../../styles/AdminSessions.css";
 
@@ -30,6 +30,8 @@ function AdminSessions() {
     const { users, sessions, fetchSessions, loading, error } = useOutletContext();
     const [selectedSession, setSelectedSession] = useState(null);
     const [sessionSearchTerm, setSessionSearchTerm] = useState("");
+    const [sessionCancel, setSessionCancel] = useState(null);
+    const [cancelError, setCancelError] = useState("");
 
     // Create a new session and refresh the list
     async function handleSessionCreate(sessionData) {
@@ -72,6 +74,19 @@ function AdminSessions() {
     }
 
     const filteredSessions = searchSessions(sessionSearchTerm);
+
+  async  function cancelSessionHandler(){
+    setCancelError("");
+    try{
+       await cancelSession(sessionCancel.id);
+       await fetchSessions();
+       setSessionCancel(null);
+    }catch (error) {
+            setCancelError(error.message || "Unable to cancel session. Please try again.");
+    }
+    
+      
+    }
 
   return (
     <section className="admin-dashboard__section admin-sessions">
@@ -140,6 +155,10 @@ function AdminSessions() {
                   <td>{session.status}</td>
                   <td>
                     <button onClick={() => setSelectedSession(session)}>Edit</button>
+                    <button onClick={() => {
+                      setCancelError("");
+                      setSessionCancel(session);
+                    }}>Cancel</button>
                   </td>
                 </tr>
                 );
@@ -160,10 +179,23 @@ function AdminSessions() {
                   title={null}
                 />            
                 
-              </div>
-                
+              </div>                
             </Modal>
         )}
+         {/*Cancel session modal*/}
+         {sessionCancel && (
+          <Modal title="Cancel Session" onClose={() => setSessionCancel(null)}>
+              <div onClick={(e) => e.stopPropagation()}>
+                <p>Are you sure you want to cancel the Session corresponding to ID-number: {sessionCancel.id}</p>
+                {cancelError && (
+                  <p className="admin-dashboard__error" role="alert">{cancelError}</p>
+                )}
+                <button onClick={() => setSessionCancel(null)}>Keep Session</button>
+                <button onClick={cancelSessionHandler}>Confirm</button>
+              </div>
+
+          </Modal>
+         )}
 
     </section>
   );

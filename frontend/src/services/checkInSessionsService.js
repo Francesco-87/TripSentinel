@@ -70,4 +70,20 @@ async function getCheckInMethods() {
     }
 }
 
-export { getCheckInSessions, adminCreateCheckInSession, adminUpdateSession, getCheckInMethods };
+async function cancelSession(sessionId){
+    try {
+        const response = await fetch(`http://localhost:8080/api/check-in-sessions/${sessionId}/cancel`, {
+            method: 'POST',
+        });
+        
+     if (!response.ok) {
+            const errorData = await response.json().catch(() => null);
+            throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+        }
+       
+    } catch (error) {
+        console.error('Error Canceling session:', error);
+        throw error;
+    }
+}
+export { getCheckInSessions, adminCreateCheckInSession, adminUpdateSession, getCheckInMethods, cancelSession };
