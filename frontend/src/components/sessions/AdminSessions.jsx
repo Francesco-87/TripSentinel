@@ -27,21 +27,21 @@ function formatSessionTime(timestamp, timeZone) {
 function AdminSessions() {
 
     // The parent owns sessions so list updates also refresh the overview counts.
-    const { sessions, fetchSessions, loading, error } = useOutletContext();
+    const { users, sessions, fetchSessions, loading, error } = useOutletContext();
     const [selectedSession, setSelectedSession] = useState(null);
     const [sessionSearchTerm, setSessionSearchTerm] = useState("");
 
     // Create a new session and refresh the list
     async function handleSessionCreate(sessionData) {
-        await adminCreateCheckInSession(sessionData)
-        await fetchSessions()
+        await adminCreateCheckInSession(sessionData);
+        await fetchSessions();
     }
 
     // Update an existing session and close the edit modal
     async function handleSessionUpdate(sessionData) {
-        await adminUpdateSession(selectedSession.id, sessionData)
-        await fetchSessions()
-        setSelectedSession(null)
+        await adminUpdateSession(selectedSession.id, sessionData);
+        await fetchSessions();
+        setSelectedSession(null);
     }
 
     function searchSessions(sessionSearchTerm) {
@@ -49,14 +49,29 @@ function AdminSessions() {
 
         if (!searchTerm) return sessions;
 
+       const filteredUsers = users.filter(user =>
+          `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm)
+      );
+      const matchingUserIds = filteredUsers.map(user => user.id);
         return sessions.filter(session => {
-              return session.id.toString() === searchTerm || 
-              session.customerId.toString() === searchTerm || 
-              session.responderId.toString() === searchTerm;
+            
+            return session.id.toString() === searchTerm ||
+                session.customerId.toString() === searchTerm ||
+                session.responderId.toString() === searchTerm ||
+                matchingUserIds.includes(session.customerId) ||
+                matchingUserIds.includes(session.responderId) ||
+                session.locationDescription.toLowerCase().includes(searchTerm);
+                
+               
         });
-      }
+    }
 
-      const filteredSessions = searchSessions(sessionSearchTerm)
+    function matchUserToId(sessionUserId) {
+        const userFound = users.find(user => user.id === sessionUserId);
+        return userFound;
+    }
+
+    const filteredSessions = searchSessions(sessionSearchTerm);
 
   return (
     <section className="admin-dashboard__section admin-sessions">
@@ -88,7 +103,6 @@ function AdminSessions() {
                 <th scope="col">Start Time</th>
                 <th scope="col">Expected Return</th>
                 <th scope="col">Latest Check-In</th>
-                <th scope="col">Time Zone</th>
                 <th scope="col">Status</th>
                 <th scope="col">Actions</th>
               </tr>
@@ -96,25 +110,40 @@ function AdminSessions() {
             <tbody>
               {filteredSessions.length === 0 && (
                 <tr>
-                  <td colSpan={10}>No sessions found.</td>
+                  <td colSpan={9}>No sessions found.</td>
                 </tr>
               )}
-              {filteredSessions.map(session => (
+              {filteredSessions.map(session => {
+                // Find both participants once per row. IDs remain visible if a user is missing.
+                const customer = matchUserToId(session.customerId);
+                const responder = matchUserToId(session.responderId);
+
+                return (
                 <tr key={session.id}>
                   <td>{session.id}</td>
-                  <td>{session.customerId}</td>
-                  <td>{session.responderId}</td>
+                  <td>
+                    {customer && (
+                      <div>{customer.firstName} {customer.lastName}</div>
+                    )}
+                    <small>ID: {session.customerId}</small>
+                  </td>
+                  <td>
+                    {responder && (
+                      <div>{responder.firstName} {responder.lastName}</div>
+                    )}
+                    <small>ID: {session.responderId}</small>
+                  </td>
                   <td>{session.locationDescription}</td>
-                  <td>{formatSessionTime(session.startAt, session.timeZone)}</td>
-                  <td>{formatSessionTime(session.expectedReturnAt, session.timeZone)}</td>
-                  <td>{formatSessionTime(session.latestCheckInAt, session.timeZone)}</td>
-                  <td>{session.timeZone}</td>
+                  <td title={session.timeZone}>{formatSessionTime(session.startAt, session.timeZone)}</td>
+                  <td title={session.timeZone}>{formatSessionTime(session.expectedReturnAt, session.timeZone)}</td>
+                  <td title={session.timeZone}>{formatSessionTime(session.latestCheckInAt, session.timeZone)}</td>
                   <td>{session.status}</td>
                   <td>
                     <button onClick={() => setSelectedSession(session)}>Edit</button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

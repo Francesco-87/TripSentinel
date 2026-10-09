@@ -10,3 +10,39 @@
 }
 .admin-sessions__search input::placeholder { color: var(--text-muted); }
 .admin-sessions__search input:hover { border-color: var(--accent); }
+
+/* Keep short identifiers compact and reserve more space for participant names. */
+.admin-sessions th:first-child,
+.admin-sessions td:first-child:not([colspan]) {
+  width: 4.5rem;
+  min-width: 0;
+  padding-inline: 0.65rem;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-sessions td:nth-child(2),
+.admin-sessions td:nth-child(3) {
+  min-width: 10rem;
+  overflow-wrap: break-word;
+}
+
+.admin-sessions td small {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--text-muted);
+}
+
+.admin-sessions td:nth-child(4) {
+  min-width: 12rem;
+}
+
+.admin-sessions td:nth-child(5),
+.admin-sessions td:nth-child(6),
+.admin-sessions td:nth-child(7) {
+  min-width: 8rem;
+  overflow-wrap: normal;
+  font-variant-numeric: tabular-nums;
+}
