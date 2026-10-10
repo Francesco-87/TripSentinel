@@ -10,6 +10,7 @@ import DashboardLayout from './components/layout/DashboardLayout'
 import AdminDashboard from './components/dashboard/AdminDashboard'
 import AdminUsers from './components/users/AdminUsers'
 import AdminSessions from './components/sessions/AdminSessions'
+import AdminAvailability from './components/availability/AdminAvailability'
 import ResponderDashboard from './components/dashboard/ResponderDashboard'
 import CustomerDashboard from './components/dashboard/CustomerDashboard'
 
@@ -32,6 +33,7 @@ function App() {
         <Route index element={<Navigate to="users" replace />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="sessions" element={<AdminSessions />} />
+        <Route path="availability" element={<AdminAvailability/>}/>
       </Route>
         
       <Route path="/responder" element={<ResponderDashboard />} />

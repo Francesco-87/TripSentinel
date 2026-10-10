@@ -1,5 +1,6 @@
 import {useState, useId, useEffect, useCallback} from "react";
 import "../../styles/SessionForm.css";
+import { toLocalDateTimeInput } from "../../utils/dateTime.js";
 import {getCheckInMethods} from "../../services/checkInSessionsService.js";
 
 
@@ -42,28 +43,6 @@ function SessionForm({ onSubmit, initialData = null, submitLabel = "Create Sessi
             importantNotes: initialData.importantNotes ?? "",
         }
     }
-    //For timezone, convert to local time
-   function toLocalDateTimeInput(timestamp, timeZone) {
-    if (!timestamp) return "";
-
-    const formatter = new Intl.DateTimeFormat("en-GB", {
-        timeZone,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23",
-    });
-
-    const parts = formatter.formatToParts(new Date(timestamp));
-
-    const getPart = (type) =>
-        parts.find((part) => part.type === type).value;
-
-    return `${getPart("year")}-${getPart("month")}-${getPart("day")}T${getPart("hour")}:${getPart("minute")}`;
-}
-
     // Keep this reusable for retries without changing the effect dependency each render.
     const fetchCheckInMethods = useCallback(() => {
         return getCheckInMethods().then(

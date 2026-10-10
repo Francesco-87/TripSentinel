@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { getUsers } from '../../services/userService.js';
 import {getCheckInSessions} from '../../services/checkInSessionsService.js';
+import {getResponderAvailability} from "../../services/availabilityServices.js";
 
 import '../../styles/AdminDashboard.css';
 import { Outlet, NavLink } from 'react-router-dom';
@@ -18,6 +19,7 @@ function AdminDashboard() {
     });
     const [users, setUsers] = useState([]);
     const [sessions, setSessions] = useState([]);
+    const [responderAvailability, setResponderAvailability] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -53,16 +55,27 @@ function AdminDashboard() {
                 setError(error);
             }
         }, []);
+
+    const fetchAvailability = useCallback(async () => {
+        try{
+            const availability = await getResponderAvailability();
+            setResponderAvailability(availability);
+        }catch (error){
+            console.error('Error fetching responderAvailability:', error);
+                setError(error);
+        }
+    }, []);
+
     // Wait for both independent requests before showing the dashboard.
     const loadDashboard = useCallback(async () => {
         try{
             setLoading(true);
             setError(null);
-            await Promise.all([fetchUsers(), fetchSessions()]);
+            await Promise.all([fetchUsers(), fetchSessions(), fetchAvailability(),]);
         } finally {
             setLoading(false);
         }
-    }, [fetchUsers, fetchSessions]);
+    }, [fetchUsers, fetchSessions, fetchAvailability]);
 
     useEffect(() => {
         loadDashboard();
@@ -95,10 +108,10 @@ function AdminDashboard() {
         <nav className="admin-dashboard__nav" aria-label="Admin dashboard navigation">
             <NavLink to="/admin/users" className="admin-dashboard__nav-link">Users</NavLink>
             <NavLink to="/admin/sessions" className="admin-dashboard__nav-link">Sessions</NavLink>
-            <button type="button" className="admin-dashboard__nav-link" disabled>Availability</button>
+            <NavLink to="/admin/availability" className="admin-dashboard__nav-link">Availability</NavLink>
         </nav>
         {/* Share one user list between the overview and nested management views. */}
-        <Outlet context={{ users, fetchUsers, fetchSessions,sessions, loading, error }} />
+        <Outlet context={{ users, fetchUsers, fetchSessions,sessions, fetchAvailability, responderAvailability, loading, error }} />
     </section>
 
 

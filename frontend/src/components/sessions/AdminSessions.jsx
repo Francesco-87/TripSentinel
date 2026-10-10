@@ -2,27 +2,14 @@ import {useState} from "react";
 import { useOutletContext } from 'react-router-dom';
 import SessionForm from "./SessionForm.jsx";
 import {adminCreateCheckInSession, adminUpdateSession, cancelSession} from "../../services/checkInSessionsService.js";
+import { formatDateTime } from "../../utils/dateTime.js";
+import { matchUserToId } from "../../utils/userUtils.js";
 import Modal from "../layout/Modal.jsx";
 import "../../styles/AdminSessions.css";
 
 
 
 
-
-// Display backend UTC timestamps in the session's timezone, not the browser's timezone.
-function formatSessionTime(timestamp, timeZone) {
-    if (!timestamp) return "—";
-
-    return new Intl.DateTimeFormat("en-GB", {
-        timeZone,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23",
-    }).format(new Date(timestamp));
-}
 
 function AdminSessions() {
 
@@ -67,11 +54,6 @@ function AdminSessions() {
                 
                
         });
-    }
-
-    function matchUserToId(sessionUserId) {
-        const userFound = users.find(user => user.id === sessionUserId);
-        return userFound;
     }
 
     const filteredSessions = searchSessions(sessionSearchTerm);
@@ -135,8 +117,8 @@ function AdminSessions() {
               )}
               {filteredSessions.map(session => {
                 // Find both participants once per row. IDs remain visible if a user is missing.
-                const customer = matchUserToId(session.customerId);
-                const responder = matchUserToId(session.responderId);
+                const customer = matchUserToId(users, session.customerId);
+                const responder = matchUserToId(users, session.responderId);
 
                 return (
                 <tr key={session.id}>
@@ -154,9 +136,9 @@ function AdminSessions() {
                     <small>ID: {session.responderId}</small>
                   </td>
                   <td>{session.locationDescription}</td>
-                  <td title={session.timeZone}>{formatSessionTime(session.startAt, session.timeZone)}</td>
-                  <td title={session.timeZone}>{formatSessionTime(session.expectedReturnAt, session.timeZone)}</td>
-                  <td title={session.timeZone}>{formatSessionTime(session.latestCheckInAt, session.timeZone)}</td>
+                  <td title={session.timeZone}>{formatDateTime(session.startAt, session.timeZone)}</td>
+                  <td title={session.timeZone}>{formatDateTime(session.expectedReturnAt, session.timeZone)}</td>
+                  <td title={session.timeZone}>{formatDateTime(session.latestCheckInAt, session.timeZone)}</td>
                   <td>{session.status}</td>
                   <td>
                     <button onClick={() => setSelectedSession(session)}>Edit</button>
